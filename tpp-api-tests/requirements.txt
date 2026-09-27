@@ -1,0 +1,9 @@
+pytest>=9,<10
+pytest-bdd>=8.1,<9
+httpx>=0.28,<1
+psycopg[binary]>=3.2,<4
+redis>=6,<7
+schemathesis>=4,<5
+python-dotenv>=1,<2
+PyYAML>=6,<7
+argon2-cffi>=25,<26
