@@ -1,0 +1,20 @@
+.carousel { position: absolute; inset: 0; overflow: hidden; background: var(--ink); color: #fff; }
+.carousel__slide { position: absolute; inset: 0; opacity: 0; transition: opacity .9s ease; }
+.carousel__slide.is-active { opacity: 1; }
+.carousel__art, .carousel__art svg, .carousel__art img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.carousel__art img { object-fit: cover; }
+.carousel__caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 5rem 2.5rem 4.5rem;
+  background: linear-gradient(transparent, rgba(8, 20, 27, .9)); }
+.carousel__caption h2 { margin: 0 0 .4rem; font-size: 1.65rem; line-height: 1.2; }
+.carousel__caption p { margin: 0; max-width: 36ch; color: #c3d3d1; line-height: 1.5; }
+.carousel__dots { position: absolute; left: 2.5rem; bottom: 1.75rem; display: flex; gap: .5rem; }
+.carousel__dot { width: 30px; height: 20px; padding: 7px 0; border: 0; background: rgba(255,255,255,.35);
+  background-clip: content-box; border-radius: 6px; cursor: pointer; }
+.carousel__dot[aria-current='true'] { background-color: var(--amber-light); }
+@media (max-width: 860px) {
+  .carousel__caption { padding: 2rem 1.25rem 3rem; }
+  .carousel__caption h2 { font-size: 1.15rem; }
+  .carousel__caption p { display: none; }
+  .carousel__dots { left: 1.25rem; bottom: .9rem; }
+}
+@media (prefers-reduced-motion: reduce) { .carousel__slide { transition: none; } }
