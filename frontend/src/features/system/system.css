@@ -1,0 +1,31 @@
+.system-section h2 { font-size: 1.15rem; margin: 0 0 .35rem; }
+.system-section + .system-section { margin-top: 2.25rem; }
+.system-section > .muted { margin: 0 0 1rem; font-size: .9rem; }
+
+.svc-grid, .console-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.console-grid { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+
+.svc-card { padding: 1rem 1.1rem; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); }
+.svc-card h3 { margin: 0 0 .15rem; font-size: 1rem; }
+.svc-card .muted { margin: 0 0 .75rem; font-size: .85rem; }
+
+.svc-badge { display: inline-flex; align-items: center; gap: .45rem; padding: .2rem .7rem; border-radius: 999px; font-size: .85rem; font-weight: 600; }
+.svc-badge__dot { width: .55rem; height: .55rem; border-radius: 50%; background: currentColor; }
+.svc-badge--ok { background: #e7f5ee; color: #146c43; }
+.svc-badge--warn { background: #fdf3e2; color: #8a5a00; }
+.svc-badge--off { background: #fdecea; color: var(--danger); }
+.svc-badge--wait, .svc-badge--idle { background: #eceff0; color: #52666e; }
+.svc-badge--wait .svc-badge__dot { animation: svc-pulse .9s ease-in-out infinite alternate; }
+@keyframes svc-pulse { from { opacity: .3; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .svc-badge--wait .svc-badge__dot { animation: none; } }
+
+.console { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.1rem; background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius); color: var(--ink); text-decoration: none; }
+.console:hover { border-color: var(--teal); box-shadow: 0 2px 8px rgba(20, 35, 43, .08); }
+.console__icon { flex: none; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 10px; background: #d7f0ec; color: var(--teal-dark); }
+.console strong { display: block; }
+.console small { color: #52666e; }
+
+.sim-panel { margin-bottom: 1.75rem; }
+.sim-panel .alert { margin-top: 0; }
+.sim-panel .field { max-width: 320px; margin-top: 1rem; }

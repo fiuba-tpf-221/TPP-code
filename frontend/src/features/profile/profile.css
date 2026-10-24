@@ -1,0 +1,25 @@
+.breadcrumb ol { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; margin: 0 0 .75rem; font-size: .9rem; color: #52666e; }
+.breadcrumb li + li::before { content: '/'; margin-right: .4rem; }
+.breadcrumb a { color: var(--teal-dark); }
+
+.card { max-width: 860px; margin-top: 1.25rem; padding: 1.25rem 1.5rem 1.5rem; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+.card h2 { margin: 0 0 .25rem; font-size: 1.15rem; }
+.card > .muted { margin: 0 0 .5rem; }
+.card .alert { margin-top: 1rem; }
+
+/* Etiqueta a la izquierda y campo a la derecha, como en el wireframe */
+.profile-form .field { display: grid; grid-template-columns: 190px minmax(0, 1fr); column-gap: 1rem; align-items: center; margin-top: 1rem; }
+.profile-form .field input, .profile-form .field__control { max-width: 420px; margin-top: 0; }
+.profile-form .field__hint, .profile-form .field__error { grid-column: 2; }
+.profile-form__actions { margin-top: 1.25rem; padding-left: 206px; }
+
+.profile-password { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 1.5rem; align-items: start; }
+.requirements--detailed { margin-top: 1rem; font-size: .9rem; }
+.requirements--detailed ul ul { margin-top: .25rem; }
+
+@media (max-width: 900px) {
+  .profile-password { grid-template-columns: 1fr; }
+  .profile-form .field { grid-template-columns: 1fr; }
+  .profile-form .field__hint, .profile-form .field__error { grid-column: 1; }
+  .profile-form__actions { padding-left: 0; }
+}
