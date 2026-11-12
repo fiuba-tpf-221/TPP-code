@@ -1,0 +1,105 @@
+/* Tema de login TPP: misma paleta y composición que la pantalla de acceso de la app (frontend/src/features/auth/auth.css). */
+:root {
+  --ink: #14232b; --teal: #0f766e; --teal-dark: #0b4f4a; --amber: #d9902f; --amber-light: #e9a84c;
+  --paper: #f4f7f6; --line: #d6e0de; --danger: #b42318; --muted: #52666e; --radius: 8px;
+}
+html.tpp, html.tpp body { height: auto; min-height: 100%; background: var(--paper) !important; background-image: none !important; }
+html.tpp body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--ink); font-size: 16px; }
+html.tpp * { box-sizing: border-box; }
+html.tpp :focus-visible { outline: 3px solid #5eead4; outline-offset: 2px; }
+
+/* Layout en dos columnas: ilustración + formulario */
+.tpp-auth { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(420px, 500px); background: var(--paper); }
+.tpp-aside { position: relative; overflow: hidden; background: var(--ink); color: #fff; }
+.tpp-aside img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.tpp-aside__caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 5rem 2.5rem 2.5rem; background: linear-gradient(transparent, rgba(8, 20, 27, .9)); }
+.tpp-aside__caption h2 { margin: 0 0 .4rem; font-weight: 700; font-size: 1.65rem; line-height: 1.2; color: #fff; }
+.tpp-aside__caption p { margin: 0; max-width: 36ch; color: #c3d3d1; line-height: 1.5; }
+
+.tpp-main { display: flex; flex-direction: column; justify-content: center; gap: 1.5rem; padding: 2rem clamp(1.25rem, 4vw, 3rem); }
+.tpp-brand { display: flex; flex-direction: column; gap: .15rem; }
+.tpp-brand strong { font-size: 1.5rem; letter-spacing: .04em; }
+.tpp-brand span { color: var(--muted); }
+
+/* Tarjeta (equivale a .window) */
+.tpp-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 12px 32px rgba(20, 35, 43, .08);
+  width: 100%; max-width: none; margin: 0; padding: 0; }
+.tpp-card__header { position: relative; padding: 1.5rem 1.75rem .25rem; border: 0; background: #fff; text-align: left; }
+.tpp-card__header::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 3rem; height: 3px; background: var(--amber); }
+.tpp-card #kc-page-title, .tpp-card h1 { margin: 0 0 .75rem; font-size: 1.35rem; font-weight: 700; color: var(--ink); text-align: left; }
+.tpp-required { display: block; margin-bottom: .25rem; font-size: .8rem; color: var(--muted); }
+#kc-content { padding: 1.25rem 1.75rem 1.75rem; }
+#kc-content-wrapper { padding: 0; }
+
+/* Campos */
+.tpp .form-horizontal { margin: 0; }
+.tpp .form-horizontal .form-group { margin: 1rem 0 0; }
+.tpp .form-horizontal .form-group:first-child { margin-top: 0; }
+.tpp .form-horizontal .form-group > [class*='col-'] { float: none; width: 100%; padding: 0; }
+.tpp .pf-c-form__label, .tpp label { display: block; margin: 0; font-size: .9rem; font-weight: 600; color: var(--ink); }
+.tpp .pf-c-form__label-text { font-size: .9rem; font-weight: 600; color: var(--ink); }
+.tpp input.pf-c-form-control, .tpp .pf-c-form-control, .tpp select, .tpp textarea.form-control {
+  display: block; width: 100%; height: auto; margin-top: .3rem; padding: .65rem .75rem; font: inherit; font-size: 1rem; color: var(--ink);
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: none; }
+.tpp .pf-c-form-control:focus { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(15, 118, 110, .2); outline: none; }
+.tpp .pf-c-form-control[aria-invalid='true'], .tpp .has-error .pf-c-form-control { border-color: var(--danger); }
+.tpp .pf-c-form-control[readonly], .tpp .pf-c-form-control:disabled { background: #eef2f1; color: var(--muted); }
+.tpp .pf-c-form__helper-text, .tpp .kc-feedback-text { display: block; margin: .3rem 0 0; font-size: .85rem; color: var(--danger); }
+.tpp .subtitle, .tpp .required { color: var(--danger); }
+
+/* Recordarme / olvidé mi contraseña */
+.tpp .login-pf-settings { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; }
+.tpp #kc-form-options { flex: 1; }
+.tpp .checkbox, .tpp .checkbox label { margin: 0; font-weight: 400; font-size: .9rem; color: var(--ink); }
+.tpp .checkbox input { margin-right: .4rem; accent-color: var(--teal); }
+
+/* Botones (equivale a .btn .btn--block) */
+.tpp .pf-c-button, .tpp input[type='submit'], .tpp button[type='submit'] {
+  display: block; width: 100%; margin-top: .25rem; padding: .65rem 1.1rem; font: inherit; font-size: 1rem; line-height: 1.4; text-align: center;
+  color: #fff; background: var(--teal); border: 0; border-radius: var(--radius); cursor: pointer; text-transform: none; box-shadow: none; }
+.tpp .pf-c-button:hover, .tpp input[type='submit']:hover, .tpp button[type='submit']:hover { background: var(--teal-dark); color: #fff; }
+.tpp .pf-c-button:disabled { background: #b8c4c2; cursor: not-allowed; }
+.tpp .pf-c-button.pf-m-secondary, .tpp .pf-c-button.btn-default, .tpp #kc-cancel, .tpp input[name='cancel-aia'] {
+  background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.tpp .pf-c-button.pf-m-secondary:hover, .tpp .pf-c-button.btn-default:hover, .tpp #kc-cancel:hover { background: #eaf0ef; color: var(--ink); }
+.tpp #kc-form-buttons { margin-top: 1.25rem; }
+.tpp #kc-form-buttons .pf-c-button + .pf-c-button { margin-top: .6rem; }
+
+/* Enlaces */
+.tpp a, .tpp a:visited { color: var(--teal-dark); }
+.tpp a:hover { color: var(--teal); text-decoration: underline; }
+.tpp #kc-info { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); text-align: center; font-size: .95rem; color: var(--muted); }
+.tpp #kc-registration-container, .tpp #kc-registration { margin: 0; padding: 0; border: 0; }
+.tpp #kc-form-options + div, .tpp .login-pf-settings span { font-size: .9rem; }
+.tpp #kc-attempted-username { font-size: 1.1rem; font-weight: 600; }
+.tpp p.instruction { margin: .25rem 0 1rem; color: var(--muted); font-size: .95rem; }
+
+/* Mensajes (equivale a .alert) */
+.tpp-alert { display: flex; gap: .6rem; margin: 0 0 1rem; padding: .75rem .9rem; border: 1px solid; border-radius: var(--radius); font-size: .95rem; line-height: 1.4; }
+.tpp-alert--error   { background: #fdecea; border-color: #f3b8b2; color: var(--danger); }
+.tpp-alert--warning { background: #fdf3e2; border-color: #e9c98f; color: #8a5a00; }
+.tpp-alert--success { background: #e7f5ee; border-color: #a9d9bf; color: #146c43; }
+.tpp-alert--info    { background: #e8f1fb; border-color: #b7d1ef; color: #1d4e89; }
+
+/* Selector de idioma (si algún día se habilitan varios) */
+.tpp #kc-locale { text-align: right; margin-bottom: .5rem; }
+.tpp #kc-locale ul { display: none; position: absolute; right: 0; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: .25rem 0; list-style: none; z-index: 5; }
+.tpp #kc-locale-dropdown { position: relative; display: inline-block; }
+.tpp #kc-locale-dropdown:hover ul { display: block; }
+.tpp #kc-locale ul a { display: block; padding: .3rem .9rem; font-size: .9rem; }
+
+/* Proveedores sociales (no hay en este realm, pero quedan prolijos) */
+.tpp .kc-social-section hr { border-color: var(--line); }
+.tpp .kc-social-section h4 { font-size: .85rem; color: var(--muted); text-align: center; }
+.tpp .kc-social-links { list-style: none; margin: 0; padding: 0; }
+.tpp .kc-social-links li + li { margin-top: .6rem; }
+.tpp .kc-social-item { background: #fff !important; color: var(--ink) !important; border: 1px solid var(--line) !important; }
+
+@media (max-width: 860px) {
+  .tpp-auth { grid-template-columns: 1fr; }
+  .tpp-aside { height: 220px; order: -1; }
+  .tpp-aside__caption { padding: 2rem 1.25rem 1rem; }
+  .tpp-aside__caption h2 { font-size: 1.15rem; }
+  .tpp-aside__caption p { display: none; }
+  .tpp-main { justify-content: flex-start; padding-top: 1.5rem; }
+}
