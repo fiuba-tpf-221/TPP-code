@@ -8,6 +8,8 @@
 .sidebar a { display: flex; align-items: center; gap: .6rem; padding: .5rem .6rem; border-radius: var(--radius); color: var(--ink); text-decoration: none; }
 .sidebar a:hover { background: #eaf0ef; }
 .sidebar a.active { background: #d7f0ec; color: var(--teal-dark); font-weight: 600; }
+.sidebar__submenu { display: flex; flex-direction: column; margin: .1rem 0 .4rem 1.3rem; border-left: 1px solid var(--line); padding-left: .5rem; }
+.sidebar__submenu a { padding: .35rem .6rem; font-size: .88rem; }
 .content { flex: 1; min-width: 0; max-width: 1200px; padding: 2rem 1.5rem; }
 
 .usermenu { position: relative; }
@@ -32,6 +34,7 @@
   .sidebar__label { display: none; }
   .sidebar a svg { display: none; }
   .sidebar a { white-space: nowrap; }
+  .sidebar__submenu { display: none; } /* en mobile, la navegación entre sub-secciones queda en las pestañas de la página */
 }
 
 .sidebar a { display: flex; align-items: center; gap: .6rem; }

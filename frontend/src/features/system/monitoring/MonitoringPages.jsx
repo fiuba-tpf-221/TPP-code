@@ -199,21 +199,14 @@ function Sources() {
       />
       <div className="mon-source-grid">
         {[
-          ['jaeger', 'Jaeger', 'Trazas y recorridos', '/auditoria'],
           ['prometheus', 'Prometheus', 'Series y recursos', '/sistema/infraestructura'],
-          ['collector', 'OpenTelemetry', 'Salud del Collector', '/sistema/opentelemetry'],
+          ['collector', 'Visión del sistema', 'Salud del Collector', '/sistema/opentelemetry'],
           ['grafana', 'Grafana', 'Paneles aprovisionados', '/sistema/dashboards'],
         ].map(([id, name, description, url]) => (
           <Link className="mon-source" key={id} to={`${url}?${params}`}>
             <div>
               <Icon
-                name={
-                  id === 'jaeger'
-                    ? 'trace'
-                    : id === 'grafana'
-                      ? 'chart'
-                      : 'services'
-                }
+                name={id === 'grafana' ? 'chart' : 'services'}
                 size={20}
               />
               <Icon name="arrow" size={15} />
@@ -244,7 +237,7 @@ export function MonitoringOverview() {
     <>
       <MonitoringHeader
         section="RESUMEN"
-        title="Vista General"
+        title="Vista general"
         description="Estado de los servicios y consumo de recursos."
       />
       <MonitoringNotice />
@@ -459,8 +452,8 @@ export function Databases() {
   return (
     <>
       <MonitoringHeader
-        section="POSTGRESQL"
-        title="PostgreSQL"
+        section="BASE DE DATOS"
+        title="Base de datos"
         description="Capacidad del almacenamiento, tamaño de las bases y conexiones."
       />
       <MonitoringNotice />
@@ -585,8 +578,8 @@ export function Telemetry() {
   return (
     <>
       <MonitoringHeader
-        section="OPENTELEMETRY"
-        title="OpenTelemetry"
+        section="VISIÓN DEL SISTEMA"
+        title="Visión del sistema"
         description="Recepción de trazas, errores de envío y recursos del Collector."
       />
       <MonitoringNotice />

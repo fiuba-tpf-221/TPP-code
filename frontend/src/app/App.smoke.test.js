@@ -62,11 +62,14 @@ describe('con el administrador de demostración, todas las pestañas levantan', 
     expect(text()).not.toContain('Sin acceso');
   });
 
-  test('Sistema muestra Vista General y el sub-índice de secciones', async () => {
+  test('Sistema muestra Vista general y el sub-índice de secciones, con nombres descriptivos', async () => {
     await open('/sistema');
-    expect(text()).toContain('Vista General');
+    expect(text()).toContain('Vista general');
     expect([...container.querySelectorAll('.subnav a')].map((a) => a.textContent)).toEqual([
-      'Vista General', 'Infraestructura', 'PostgreSQL', 'OpenTelemetry', 'Dashboards',
+      'Vista general', 'Infraestructura', 'Base de datos', 'Visión del sistema', 'Dashboards',
+    ]);
+    expect([...container.querySelectorAll('.sidebar__submenu a')].map((a) => a.textContent)).toEqual([
+      'Vista general', 'Infraestructura', 'Base de datos', 'Visión del sistema', 'Dashboards',
     ]);
   });
 
@@ -76,6 +79,16 @@ describe('con el administrador de demostración, todas las pestañas levantan', 
     expect([...container.querySelectorAll('.subnav a')].map((a) => a.textContent)).toEqual([
       'Resumen de trazas', 'Explorar trazas', 'Servicios de trazas',
     ]);
+    expect([...container.querySelectorAll('.sidebar__submenu a')].map((a) => a.textContent)).toEqual([
+      'Resumen de trazas', 'Explorar trazas', 'Servicios de trazas',
+    ]);
+  });
+
+  test('el submenú de Sistema no aparece en otra sección, y desaparece al salir de Sistema', async () => {
+    await open('/usuarios');
+    expect(container.querySelector('.sidebar__submenu')).toBeNull();
+    await open('/sistema/dashboards');
+    expect(container.querySelectorAll('.sidebar__submenu a')).toHaveLength(5); // sigue expandido en una sub-página
   });
 
   test('el detalle de un usuario abre desde la lista', async () => {

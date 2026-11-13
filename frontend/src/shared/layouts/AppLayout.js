@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
 import { NAV_GROUPS, ROUTES } from '../../config/routes';
 import { APP_NAME } from '../../config/app';
@@ -12,6 +12,7 @@ import './layout.css';
 // Sin permisos: no hay menú lateral; siguen disponibles Home, Mi perfil y Cerrar sesión.
 export default function AppLayout() {
   const { can } = useAuth();
+  const location = useLocation();
   const groups = NAV_GROUPS
     .map((g) => ({ ...g, items: g.items.filter((i) => !i.permission || can(i.permission)) }))
     .filter((g) => g.items.length > 0);
@@ -31,8 +32,17 @@ export default function AppLayout() {
             {groups.map((g, i) => (
               <div key={g.label || i} className="sidebar__group">
                 {g.label && <p className="sidebar__label"><Icon name={g.icon} /> {g.label}</p>}
-                {g.items.map(({ to, label, icon }) => (
-                  <NavLink key={to} to={to}><Icon name={icon} /> {label}</NavLink>
+                {g.items.map(({ to, label, icon, children }) => (
+                  <div key={to} className="sidebar__item">
+                    <NavLink to={to} end={!children}><Icon name={icon} /> {label}</NavLink>
+                    {children && location.pathname.startsWith(to) && (
+                      <div className="sidebar__submenu" aria-label={`Secciones de ${label}`}>
+                        {children.map((child) => (
+                          <NavLink key={child.to} to={child.to} end={child.end}>{child.label}</NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             ))}

@@ -5,10 +5,10 @@ import { ROUTES } from '../../config/routes';
 import '../../shared/components/subnav.css';
 
 const TABS = [
-  { to: ROUTES.SYSTEM, label: 'Vista General', end: true },
+  { to: ROUTES.SYSTEM, label: 'Vista general', end: true },
   { to: `${ROUTES.SYSTEM}/infraestructura`, label: 'Infraestructura' },
-  { to: `${ROUTES.SYSTEM}/postgresql`, label: 'PostgreSQL' },
-  { to: `${ROUTES.SYSTEM}/opentelemetry`, label: 'OpenTelemetry' },
+  { to: `${ROUTES.SYSTEM}/postgresql`, label: 'Base de datos' },
+  { to: `${ROUTES.SYSTEM}/opentelemetry`, label: 'Visión del sistema' },
   { to: `${ROUTES.SYSTEM}/dashboards`, label: 'Dashboards' },
 ];
 
