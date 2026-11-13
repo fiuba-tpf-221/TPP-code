@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tpp-observability"
+version = "0.1.0"
+description = "Biblioteca interna de tracing compartida por los procesos Python de TPP"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "opentelemetry-api==1.22.0",
+    "opentelemetry-sdk==1.22.0",
+    "opentelemetry-exporter-otlp==1.22.0",
+]
+
+[project.optional-dependencies]
+fastapi = ["fastapi==0.109.0"]
+lint = ["ruff==0.14.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

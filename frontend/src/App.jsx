@@ -53,7 +53,7 @@ function App() {
     { name: 'Grafana Dashboards', url: 'http://localhost:3001', icon: '📊', desc: 'Métricas e indicadores' },
     { name: 'RabbitMQ Console', url: 'http://localhost:15672', icon: '🐰', desc: 'Gestor de colas de mensajes' },
     { name: 'MinIO Console', url: 'http://localhost:9001', icon: '📦', desc: 'Explorador S3 / Buckets' },
-    { name: 'Jaeger Tracing', url: 'http://localhost:16686', icon: '🔍', desc: 'Trazado distribuido' },
+    { name: 'Central de monitoreo', url: `http://${window.location.hostname}:3002`, icon: '🔍', desc: 'Servicios, recursos, métricas y trazas' },
     { name: 'Prometheus Metrics', url: 'http://localhost:9090', icon: '🔥', desc: 'Servidor de métricas' },
     { name: 'SonarQube Quality', url: 'http://localhost:9000', icon: '🧹', desc: 'Análisis estático de código' },
   ];

@@ -23,8 +23,8 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
     ports:
-      - "5672:5672"   # AMQP
-      - "15672:15672" # Panel Web de Administración
+      - "5673:5672"   # AMQP desde el host; entre contenedores sigue en 5672
+      - "15673:15672" # Panel Web de Administración
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
@@ -159,7 +159,9 @@ services:
 
   # Backend (FastAPI / Python)
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: app_backend
     restart: always
     environment:
@@ -167,6 +169,12 @@ services:
       - RABBITMQ_URL=amqp://user:password@rabbitmq:5672/
       - MINIO_ENDPOINT=minio:9000
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=backend-api
+      - TRACING_SERVICE_VERSION=${TRACING_SERVICE_VERSION:-0.1.0}
+      - TRACING_ENVIRONMENT=${TRACING_ENVIRONMENT:-development}
+      - TRACING_ENABLED=${TRACING_ENABLED:-true}
+      - TRACING_SAMPLE_RATIO=${TRACING_SAMPLE_RATIO:-1}
+      - TRACING_CONSOLE_EXPORT=${TRACING_CONSOLE_EXPORT:-false}
     ports:
       - "8000:8000"
     depends_on:
@@ -181,7 +189,7 @@ services:
     container_name: app_frontend
     restart: always
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - CHOKIDAR_USEPOLLING=true
 
@@ -203,6 +211,8 @@ services:
     image: prom/prometheus:latest
     container_name: app_prometheus
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "9090:9090"
     volumes:
@@ -210,14 +220,23 @@ services:
 
   # Métricas de Contenedores (cAdvisor)
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    image: ghcr.io/google/cadvisor:0.55.1
     container_name: app_cadvisor
     restart: always
+    command:
+      # Consultar Docker permite exportar name y el alias del servicio Compose.
+      - --docker=unix:///var/run/docker.sock
+      # En Docker Desktop el socket de la VM está bajo el host montado en /rootfs.
+      # cAdvisor 0.55 también lo necesita para registrar el recolector de Docker.
+      - --containerd=${CADVISOR_CONTAINERD_SOCKET:-/rootfs/run/containerd/containerd.sock}
+      - --docker_only=true
+      - --store_container_labels=false
+      - --whitelisted_container_labels=com.docker.compose.service,com.docker.compose.project
     ports:
       - "8081:8080"
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
 

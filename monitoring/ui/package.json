@@ -1,0 +1,18 @@
+{
+  "name": "tpp-monitoring-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host 0.0.0.0"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.30.1"
+  },
+  "devDependencies": {
+    "vite": "6.4.1"
+  }
+}

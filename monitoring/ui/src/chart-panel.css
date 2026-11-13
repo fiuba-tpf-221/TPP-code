@@ -1,0 +1,55 @@
+.obs-chart-panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.obs-chart-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(16 35 30 / 55%);
+}
+.obs-chart-panel.is-expanded {
+  position: fixed;
+  inset: 24px;
+  z-index: 1001;
+  margin: 0;
+  overflow: auto;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 20%);
+}
+.obs-chart-panel.is-expanded > .obs-panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.mon-chart-canvas {
+  height: 194px;
+}
+.mon-chart-canvas svg {
+  height: 100%;
+}
+.obs-chart-panel.is-expanded .mon-chart-canvas {
+  height: clamp(260px, 58vh, 680px);
+}
+.obs-chart-panel.is-expanded .obs-activity-chart {
+  height: clamp(260px, 58vh, 680px);
+}
+.obs-chart-panel.is-expanded .obs-service-map {
+  max-height: none;
+  height: clamp(300px, 65vh, 760px);
+}
+.obs-chart-panel.is-expanded .obs-operation-list {
+  padding-block: 24px;
+}
+@media (max-width: 700px) {
+  .obs-chart-panel.is-expanded {
+    inset: 8px;
+  }
+  .obs-chart-panel-actions {
+    justify-content: flex-start;
+  }
+}

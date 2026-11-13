@@ -1,8 +1,13 @@
 {
   "id": null,
   "uid": "tpp-monitoreo-base",
-  "title": "TPP - Infraestructura",
-  "tags": ["tpp", "infra", "cadvisor"],
+  "title": "CPU y memoria de contenedores",
+  "description": "Consumo de CPU y memoria por contenedor Docker. Permite identificar qué servicios usan más recursos y cómo cambia su consumo en el tiempo.",
+  "tags": [
+    "tpp",
+    "infra",
+    "cadvisor"
+  ],
   "timezone": "browser",
   "refresh": "5s",
   "time": {
@@ -12,8 +17,13 @@
   "panels": [
     {
       "type": "timeseries",
-      "title": "Uso de CPU por Servicio (%)",
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 },
+      "title": "CPU por contenedor",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus-tpp"
@@ -24,8 +34,8 @@
             "type": "prometheus",
             "uid": "prometheus-tpp"
           },
-          "expr": "sum(rate(container_cpu_usage_seconds_total{id=~\"/docker/.*\"}[1m])) by (id) * 100",
-          "legendFormat": "{{id}}",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{id!=\"/\",image!=\"\"}[2m])) by (id, name, container_label_com_docker_compose_service) * 100",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -40,12 +50,19 @@
             "gradientMode": "opacity"
           }
         }
-      }
+      },
+      "id": 1,
+      "description": "100 % equivale a un núcleo lógico. Incluye los contenedores observados por cAdvisor."
     },
     {
       "type": "timeseries",
-      "title": "Consumo de Memoria RAM",
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 },
+      "title": "Memoria de trabajo por contenedor",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus-tpp"
@@ -56,8 +73,8 @@
             "type": "prometheus",
             "uid": "prometheus-tpp"
           },
-          "expr": "sum(container_memory_usage_bytes{id=~\"/docker/.*\"}) by (id)",
-          "legendFormat": "{{id}}",
+          "expr": "sum(container_memory_working_set_bytes{id!=\"/\",image!=\"\"}) by (id, name, container_label_com_docker_compose_service)",
+          "legendFormat": "{{name}}",
           "refId": "A"
         }
       ],
@@ -72,7 +89,9 @@
             "gradientMode": "opacity"
           }
         }
-      }
+      },
+      "id": 2,
+      "description": "Memoria de trabajo utilizada por cada contenedor, expresada en bytes. Permite comparar el consumo y detectar aumentos sostenidos."
     }
   ]
 }

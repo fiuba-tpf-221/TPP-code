@@ -1,0 +1,28 @@
+name: tpp-monitoring
+services:
+  # Central de monitoreo: consume la infraestructura principal, sin iniciarla.
+  monitoring:
+    build: .
+    container_name: app_monitoring
+    restart: always
+    ports:
+      - "3002:8080"
+    env_file:
+      - path: .env
+        required: false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../grafana/provisioning/dashboards:/app/dashboards:ro
+      # Solo se consulta statvfs del filesystem; no se recorren archivos de la base.
+      - postgres_storage:/app/postgres-storage:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    mem_limit: 512m
+    cpus: 1.0
+
+volumes:
+  postgres_storage:
+    external: true
+    name: ${MONITOR_POSTGRES_VOLUME:-tpp-code_postgres_data}

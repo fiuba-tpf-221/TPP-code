@@ -1,40 +1,12 @@
+import io
+import socket
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-import socket
-import io
-
-# --- Configuración de OpenTelemetry ---
-try:
-    from opentelemetry import trace
-    from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-    from opentelemetry.sdk.resources import Resource
-
-    # Definimos el nombre del servicio para Jaeger
-    resource = Resource.create(attributes={"service.name": "backend-api"})
-    provider = TracerProvider(resource=resource)
-    
-    # 1. Exportador a consola (imprime las trazas en los logs de Docker para depurar)
-    provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
-    
-    # 2. Exportador OTLP hacia otel-collector (agregado el prefijo http://)
-    otlp_exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317", insecure=True)
-    provider.add_span_processor(BatchSpanProcessor(otlp_exporter))
-    
-    trace.set_tracer_provider(provider)
-    otel_enabled = True
-except Exception as e:
-    print(f"Aviso OpenTelemetry: {e}")
-    otel_enabled = False
+from tpp_observability import tracing
 
 app = FastAPI(title="FIUBA TPP API")
-
-# Instrumentar la app de FastAPI si Otel cargó correctamente
-if otel_enabled:
-    FastAPIInstrumentor.instrument_app(app)
 
 # Configuración de CORS
 app.add_middleware(
@@ -44,35 +16,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+tracing.instrument_fastapi(app)
 
 # Configuración de MinIO
 minio_client = None
 try:
     from minio import Minio
+
     minio_client = Minio(
         "minio:9000",
         access_key="minioadmin",
         secret_key="minioadminpassword",
-        secure=False
+        secure=False,
     )
 except Exception as e:
     print(f"Aviso MinIO: {e}")
 
+
+@tracing.traced("infrastructure.check_tcp", kind="client")
 def check_tcp_service(host: str, port: int) -> str:
     """Verifica conectividad TCP directa con contenedores internos"""
+    tracing.set_attributes({"server.address": host, "server.port": port})
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1.5)
-        result = sock.connect_ex((host, port))
-        sock.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(1.5)
+            result = sock.connect_ex((host, port))
+        if result != 0:
+            tracing.record_error(OSError())
         return "ONLINE" if result == 0 else "OFFLINE"
-    except Exception:
+    except Exception as error:
+        tracing.record_error(error)
         return "OFFLINE"
+
 
 @app.get("/")
 def read_root():
     """Redirige la raíz a la documentación de Swagger"""
     return RedirectResponse(url="/docs")
+
 
 @app.get("/health")
 def health_check():
@@ -84,16 +65,22 @@ def health_check():
         "minio": check_tcp_service("minio", 9000),
         "otel": check_tcp_service("otel-collector", 4317),
     }
-    
+
     # Excluimos 'otel' de los servicios críticos que determinan si la app está ONLINE
-    critical_services = [services["postgres"], services["rabbitmq"], services["redis"], services["minio"]]
-    overall = "ONLINE" if all(status == "ONLINE" for status in critical_services) else "DEGRADED"
-    
-    return {
-        "status": overall,
-        "service": "backend-api",
-        "dependencies": services
-    }
+    critical_services = [
+        services["postgres"],
+        services["rabbitmq"],
+        services["redis"],
+        services["minio"],
+    ]
+    overall = (
+        "ONLINE"
+        if all(status == "ONLINE" for status in critical_services)
+        else "DEGRADED"
+    )
+
+    return {"status": overall, "service": "backend-api", "dependencies": services}
+
 
 @app.get("/files")
 def list_files():
@@ -101,11 +88,22 @@ def list_files():
     if not minio_client:
         raise HTTPException(status_code=500, detail="Cliente MinIO no disponible")
     try:
-        objects = minio_client.list_objects("tpp-bucket")
-        file_list = [obj.object_name for obj in objects]
+        with tracing.trace(
+            "storage.list_objects",
+            kind="client",
+            attributes={
+                "app.component": "object-storage",
+                "app.operation": "list_objects",
+            },
+        ):
+            # MinIO ejecuta la petición al consumir el iterador.
+            file_list = [
+                obj.object_name for obj in minio_client.list_objects("tpp-bucket")
+            ]
         return {"bucket": "tpp-bucket", "files": file_list}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/files/test-upload")
 def create_test_file():
@@ -115,13 +113,21 @@ def create_test_file():
     try:
         content = b"Archivo generado desde FastAPI TPP"
         data = io.BytesIO(content)
-        minio_client.put_object(
-            "tpp-bucket",
-            "test-api.txt",
-            data,
-            len(content),
-            content_type="text/plain"
-        )
+        with tracing.trace(
+            "storage.put_object",
+            kind="client",
+            attributes={
+                "app.component": "object-storage",
+                "app.operation": "put_object",
+            },
+        ):
+            minio_client.put_object(
+                "tpp-bucket",
+                "test-api.txt",
+                data,
+                len(content),
+                content_type="text/plain",
+            )
         return {"message": "Archivo test-api.txt creado en tpp-bucket con exito"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
