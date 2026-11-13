@@ -105,6 +105,7 @@ services:
       - "8080:8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      - ./keycloak/themes/tpp:/opt/keycloak/themes/tpp:ro
     depends_on:
       - postgres
       - redis_keycloak

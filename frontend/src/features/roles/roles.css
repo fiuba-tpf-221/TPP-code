@@ -1,0 +1,8 @@
+.perm-module { margin-top: .75rem; }
+.choice .perm { display: flex; align-items: center; gap: .5rem; margin: .4rem 0 0; }
+.perm--off { color: #52666e; }
+.tag { margin-left: .5rem; padding: .1rem .55rem; border-radius: 999px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.tag--off { background: #eceff0; color: #52666e; }
+.tag-inline { margin-left: .5rem; }
+.form-section-title { margin: 1.5rem 0 .25rem; font-size: 1.1rem; }
+.form-section-title + .muted { margin: 0 0 .5rem; }

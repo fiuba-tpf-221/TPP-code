@@ -3,9 +3,22 @@
   "realm": "tpp-realm",
   "enabled": true,
   "sslRequired": "NONE",
+  "loginTheme": "tpp",
+  "displayName": "fiuba-tpf-221",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["es"],
+  "defaultLocale": "es",
   "registrationAllowed": true,
   "resetPasswordAllowed": true,
   "rememberMe": true,
+  "roles": {
+    "realm": [
+      { "name": "administrador", "description": "Acceso total: administración, modelos y predicción" },
+      { "name": "analista", "description": "Gestión de modelos y uso de predicción" },
+      { "name": "operador", "description": "Uso de predicción" },
+      { "name": "consulta", "description": "Sin permisos adicionales" }
+    ]
+  },
   "clients": [
     {
       "clientId": "frontend-client",
@@ -31,7 +44,8 @@
           "value": "password123",
           "temporary": false
         }
-      ]
+      ],
+      "realmRoles": ["administrador"]
     }
   ]
 }
