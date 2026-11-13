@@ -10,7 +10,21 @@ import AppLayout from '../shared/layouts/AppLayout';
 import PlaceholderPage from '../shared/components/PlaceholderPage';
 import HomePage from '../features/home/HomePage';
 import ProfilePage from '../features/profile/ProfilePage';
-import SystemStatusPage from '../features/system/SystemStatusPage';
+import SystemLayout from '../features/system/SystemLayout';
+import {
+  Databases,
+  GrafanaDashboards,
+  Infrastructure,
+  MonitoringOverview,
+  Telemetry,
+} from '../features/system/monitoring/MonitoringPages';
+import AuditLayout from '../features/audit/AuditLayout';
+import {
+  TraceExplorer,
+  TraceServices,
+  TracingOverview,
+} from '../features/audit/tracing/TracingPages';
+import TraceDetail from '../features/audit/tracing/TraceDetail';
 import UsersPage from '../features/users/UsersPage';
 import UserCreatePage from '../features/users/UserCreatePage';
 import RolesPage from '../features/roles/RolesPage';
@@ -21,7 +35,6 @@ import UserDetailPage from '../features/users/UserDetailPage';
 // Módulos aún sin desarrollar: cuando exista la pantalla real, se reemplaza el elemento.
 const PLACEHOLDERS = [
   { path: ROUTES.DOMAINS, title: 'Dominios', permission: P.DOMAINS_MANAGE },
-  { path: ROUTES.AUDIT, title: 'Auditoría', permission: P.AUDIT_VIEW },
   { path: ROUTES.MODELS, title: 'Modelos', permission: P.MODELS_MANAGE },
   { path: ROUTES.PREDICTION, title: 'Predicción', permission: P.PREDICTIONS_USE },
 ];
@@ -48,9 +61,27 @@ export default function AppRouter() {
             <Route path={ROUTES.ROLE_NEW} element={<RoleCreatePage />} />
             <Route path={ROUTES.ROLE_DETAIL} element={<RoleDetailPage />} />
           </Route>
+
+          {/* Antes vivían en :3002; ahora son sub-secciones de Sistema y Auditoría (ver
+              SystemLayout/AuditLayout). La Central de Monitoreo quedó como API pura. */}
           <Route element={<RequirePermission permission={P.SYSTEM_VIEW} />}>
-            <Route path={ROUTES.SYSTEM} element={<SystemStatusPage />} />
+            <Route path={ROUTES.SYSTEM} element={<SystemLayout />}>
+              <Route index element={<MonitoringOverview />} />
+              <Route path="infraestructura" element={<Infrastructure />} />
+              <Route path="postgresql" element={<Databases />} />
+              <Route path="opentelemetry" element={<Telemetry />} />
+              <Route path="dashboards" element={<GrafanaDashboards />} />
+            </Route>
           </Route>
+          <Route element={<RequirePermission permission={P.AUDIT_VIEW} />}>
+            <Route path={ROUTES.AUDIT} element={<AuditLayout />}>
+              <Route index element={<TracingOverview />} />
+              <Route path="explorar" element={<TraceExplorer />} />
+              <Route path="servicios" element={<TraceServices />} />
+              <Route path="trazas/:traceId" element={<TraceDetail />} />
+            </Route>
+          </Route>
+
           {PLACEHOLDERS.map(({ path, title, permission }) => (
             <Route key={path} element={<RequirePermission permission={permission} />}>
               <Route path={path} element={<PlaceholderPage title={title} />} />

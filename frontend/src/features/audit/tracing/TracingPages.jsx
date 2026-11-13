@@ -1,6 +1,6 @@
-import { ChartPanel } from "../ChartPanel";
-import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { ChartPanel } from '../../../shared/components/ChartPanel';
+import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ActivityChart,
   Empty,
@@ -10,7 +10,7 @@ import {
   PanelHeader,
   QueryState,
   TraceTable,
-} from "./components";
+} from './components';
 import {
   duration,
   number,
@@ -18,8 +18,9 @@ import {
   percentile,
   serviceOf,
   serviceStats,
-} from "./model";
-import { useTracing } from "./useTracing";
+} from './model';
+import { useTracing } from './useTracing';
+import './tracing.css';
 
 // Presenta el título y las acciones de cada pantalla de trazas.
 function PageHeader({ eyebrow, title, description, children }) {
@@ -27,7 +28,7 @@ function PageHeader({ eyebrow, title, description, children }) {
     <div className="obs-page-header">
       <div>
         <div className="obs-eyebrow">
-          OBSERVABILIDAD <span>/</span> {eyebrow}
+          AUDITORÍA <span>/</span> {eyebrow}
         </div>
         <h1>{title}</h1>
         <p>{description}</p>
@@ -53,10 +54,10 @@ function QueryToolbar() {
       <span className="obs-updated" aria-live="polite">
         <Icon name="clock" size={14} />
         {busy
-          ? "Actualizando…"
+          ? 'Actualizando…'
           : updated
-            ? `Actualizado ${updated.toLocaleTimeString("es-AR", { hourCycle: "h23", hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
-            : "Pendiente de consulta"}
+            ? `Actualizado ${updated.toLocaleTimeString('es-AR', { hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit' })}`
+            : 'Pendiente de consulta'}
       </span>
       <label className="obs-auto-refresh">
         <span className="obs-sr-only">Actualización automática</span>
@@ -76,7 +77,7 @@ function QueryToolbar() {
         onClick={refresh}
         disabled={busy}
       >
-        <Icon name="refresh" className={busy ? "obs-spinning" : ""} size={16} />
+        <Icon name="refresh" className={busy ? 'obs-spinning' : ''} size={16} />
         Actualizar
       </button>
     </div>
@@ -91,7 +92,7 @@ function SampleNote() {
     <p className="obs-sample-note">
       <Icon name="filter" size={13} />
       {traces.length >= 200
-        ? "Se alcanzó el límite de 200 trazas. Acotá el período o la operación para explorar con más detalle."
+        ? 'Se alcanzó el límite de 200 trazas. Acotá el período o la operación para explorar con más detalle.'
         : `Indicadores calculados sobre ${number(traces.length)} trazas recuperadas. El muestreo y la retención pueden limitar la actividad visible.`}
     </p>
   );
@@ -116,13 +117,13 @@ function OperationsPanel({ traces }) {
             <Link
               key={`${row.service}-${row.name}`}
               className="obs-operation-row"
-              to={`/traces?${new URLSearchParams({ ...Object.fromEntries(params), operation: row.name, q: "" })}`}
+              to={`/auditoria/explorar?${new URLSearchParams({ ...Object.fromEntries(params), operation: row.name, q: '' })}`}
             >
               <div>
                 <strong title={row.name}>{row.name}</strong>
                 <span>
-                  {number(row.count)} {row.count === 1 ? "traza" : "trazas"}
-                  {row.errors ? ` · ${row.errors} con errores` : ""}
+                  {number(row.count)} {row.count === 1 ? 'traza' : 'trazas'}
+                  {row.errors ? ` · ${row.errors} con errores` : ''}
                 </span>
               </div>
               <div className="obs-operation-bar">
@@ -166,7 +167,7 @@ export function TracingOverview() {
       <div className="obs-metrics">
         <Metric
           label="Trazas recuperadas"
-          value={pending ? "—" : number(traces.length)}
+          value={pending ? '—' : number(traces.length)}
           description="En el contexto de esta consulta"
           icon="trace"
           accent
@@ -175,7 +176,7 @@ export function TracingOverview() {
           label="Latencia p95"
           value={
             pending
-              ? "—"
+              ? '—'
               : duration(percentile(traces.map((trace) => trace.duration)))
           }
           description="Percentil 95 de las trazas recuperadas"
@@ -185,19 +186,19 @@ export function TracingOverview() {
           label="Trazas con errores"
           value={
             pending || !traces.length
-              ? "—"
-              : `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format((errors / traces.length) * 100)} %`
+              ? '—'
+              : `${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format((errors / traces.length) * 100)} %`
           }
           description={
             pending
-              ? "Pendiente de consulta"
+              ? 'Pendiente de consulta'
               : `${number(errors)} de ${number(traces.length)} trazas recuperadas`
           }
           icon="error"
         />
         <Metric
           label="Servicios observados"
-          value={pending ? "—" : number(services)}
+          value={pending ? '—' : number(services)}
           description="Presentes en las trazas consultadas"
           icon="services"
         />
@@ -214,7 +215,7 @@ export function TracingOverview() {
               title="Últimas trazas"
               description="Del evento más reciente al más antiguo"
             >
-              <Link className="obs-text-link" to={`/traces?${params}`}>
+              <Link className="obs-text-link" to={`/auditoria/explorar?${params}`}>
                 Explorar todas
                 <Icon name="arrow" size={16} />
               </Link>
@@ -231,8 +232,8 @@ export function TracingOverview() {
 // Filtra, ordena y abre las trazas de la consulta actual.
 export function TraceExplorer() {
   const { traces, loading, error, params, updateParams } = useTracing();
-  const search = params.get("q") || "";
-  const sort = params.get("sort") || "recent";
+  const search = params.get('q') || '';
+  const sort = params.get('sort') || 'recent';
   const filtered = useMemo(() => {
     const needle = search.toLowerCase().trim();
     const matching = traces.filter((trace) =>
@@ -241,9 +242,9 @@ export function TraceExplorer() {
         .includes(needle),
     );
     return matching.sort((a, b) =>
-      sort === "slowest"
+      sort === 'slowest'
         ? b.duration - a.duration
-        : sort === "errors"
+        : sort === 'errors'
           ? b.errors - a.errors || b.start - a.start
           : b.start - a.start,
     );
@@ -263,7 +264,7 @@ export function TraceExplorer() {
           title="Resultados de la consulta"
           description={
             loading
-              ? "Recuperando actividad…"
+              ? 'Recuperando actividad…'
               : `${number(filtered.length)} de ${number(traces.length)} trazas coinciden`
           }
         >
@@ -284,7 +285,7 @@ export function TraceExplorer() {
             {search && (
               <button
                 className="obs-icon-button"
-                onClick={() => updateParams({ q: "" }, true)}
+                onClick={() => updateParams({ q: '' }, true)}
                 aria-label="Limpiar búsqueda"
               >
                 <Icon name="close" size={14} />
@@ -294,7 +295,7 @@ export function TraceExplorer() {
           {/^(?:[0-9a-f]{16}|[0-9a-f]{32})$/i.test(search.trim()) && (
             <Link
               className="obs-text-link"
-              to={`/traces/${search.trim()}?${params}`}
+              to={`/auditoria/trazas/${search.trim()}?${params}`}
             >
               Abrir por Trace ID
               <Icon name="arrow" size={14} />
@@ -332,7 +333,7 @@ function ServiceMap({ traces, services }) {
     trace.spans.forEach((span) =>
       (span.references || [])
         .filter(
-          (ref) => ref.refType === "CHILD_OF" && ref.traceID === trace.traceID,
+          (ref) => ref.refType === 'CHILD_OF' && ref.traceID === trace.traceID,
         )
         .forEach((ref) => {
           const parent = spans.get(ref.spanID);
@@ -449,9 +450,9 @@ function ServiceMap({ traces, services }) {
           <p className="obs-map-caption">
             {relations.size
               ? `${relations.size} relaciones observadas entre los servicios mostrados.`
-              : "No se observaron llamadas entre servicios distintos en esta consulta."}
+              : 'No se observaron llamadas entre servicios distintos en esta consulta.'}
             {services.length > 8 &&
-              " El mapa muestra los primeros ocho servicios."}
+              ' El mapa muestra los primeros ocho servicios.'}
           </p>
         </>
       )}
@@ -512,7 +513,7 @@ export function TraceServices() {
                         <td>
                           <span
                             className={
-                              row.errors ? "obs-error-text" : "obs-muted"
+                              row.errors ? 'obs-error-text' : 'obs-muted'
                             }
                           >
                             {number(row.errors)}
@@ -521,7 +522,7 @@ export function TraceServices() {
                         <td>
                           <Link
                             className="obs-text-link"
-                            to={`/traces?${new URLSearchParams({ ...Object.fromEntries(params), service: row.name, operation: "", q: "" })}`}
+                            to={`/auditoria/explorar?${new URLSearchParams({ ...Object.fromEntries(params), service: row.name, operation: '', q: '' })}`}
                           >
                             Ver trazas
                             <Icon name="arrow" size={15} />

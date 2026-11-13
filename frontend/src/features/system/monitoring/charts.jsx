@@ -1,51 +1,51 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Empty, PanelHeader } from "../tracing/components";
-import { useMetric, useMonitoring } from "./useMonitoring";
-import { ChartPanel } from "../ChartPanel";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Empty, PanelHeader } from '../../audit/tracing/components';
+import { useMetric, useMonitoring } from './useMonitoring';
+import { ChartPanel } from '../../../shared/components/ChartPanel';
 import {
   containerKey,
   containerName,
   matchesContainer,
   serviceContainer,
-} from "./containers";
+} from './containers';
 
 const COLORS = [
-  "#0f766e",
-  "#b47824",
-  "#3b79ad",
-  "#9e6378",
-  "#597340",
-  "#785eab",
-  "#9b5d32",
-  "#517a83",
+  '#0f766e',
+  '#b47824',
+  '#3b79ad',
+  '#9e6378',
+  '#597340',
+  '#785eab',
+  '#9b5d32',
+  '#517a83',
 ];
 // Formatea una medición según su unidad sin inventar valores ausentes.
-export function format(value, unit = "short") {
-  if (value == null || !Number.isFinite(value)) return "—";
-  if (unit === "bytes") {
+export function format(value, unit = 'short') {
+  if (value == null || !Number.isFinite(value)) return '—';
+  if (unit === 'bytes') {
     const index = Math.min(
       4,
       Math.max(0, Math.floor(Math.log(Math.max(1, value)) / Math.log(1024))),
     );
-    return `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(value / 1024 ** index)} ${["B", "KiB", "MiB", "GiB", "TiB"][index]}`;
+    return `${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(value / 1024 ** index)} ${['B', 'KiB', 'MiB', 'GiB', 'TiB'][index]}`;
   }
-  const text = new Intl.NumberFormat("es-AR", {
+  const text = new Intl.NumberFormat('es-AR', {
     maximumFractionDigits: 2,
   }).format(value);
-  return unit === "percent"
+  return unit === 'percent'
     ? `${text} %`
-    : unit === "ops"
+    : unit === 'ops'
       ? `${text} /s`
-      : unit === "up"
+      : unit === 'up'
         ? value === 1
-          ? "Disponible"
-          : "No saludable"
+          ? 'Disponible'
+          : 'No saludable'
         : text;
 }
 
 // Identifica una serie a partir de sus etiquetas disponibles.
 export const seriesName = (labels) =>
-  ({ total: "Capacidad total", used: "Espacio ocupado" })[labels.kind] ||
+  ({ total: 'Capacidad total', used: 'Espacio ocupado' })[labels.kind] ||
   labels.database ||
   (labels.service ? containerName(serviceContainer(labels.service)) : null) ||
   ((labels.name || labels.id || labels.container_label_com_docker_compose_service)
@@ -54,7 +54,7 @@ export const seriesName = (labels) =>
   labels.exporter ||
   labels.receiver ||
   labels.job ||
-  "Total";
+  'Total';
 // Asigna un color estable a cada nombre de serie.
 const color = (label) =>
   COLORS[
@@ -67,10 +67,10 @@ const color = (label) =>
   ];
 // Presenta el instante de una muestra en la hora local.
 const clock = (seconds) =>
-  new Date(seconds * 1000).toLocaleTimeString("es-AR", {
-    hourCycle: "h23",
-    hour: "2-digit",
-    minute: "2-digit",
+  new Date(seconds * 1000).toLocaleTimeString('es-AR', {
+    hourCycle: 'h23',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 
 // Dibuja series temporales con selección de leyenda y navegación por teclado.
@@ -87,7 +87,7 @@ function TimeSeries({ series, unit }) {
       setWidth(Math.max(1, entries[0].contentRect.width));
       setHeight(Math.max(1, entries[0].contentRect.height));
     });
-    const canvas = ref.current?.querySelector(".mon-chart-canvas");
+    const canvas = ref.current?.querySelector('.mon-chart-canvas');
     if (canvas) observer.observe(canvas);
     return () => observer.disconnect();
   }, []);
@@ -102,7 +102,7 @@ function TimeSeries({ series, unit }) {
     ? Math.max(...series.map((item) => item.points.at(-1)?.[0] ?? 0))
     : 1;
   const maximum = Math.max(1, ...points.map((point) => point[1]));
-  const left = Math.min(unit === "bytes" ? 76 : 60, width * 0.3);
+  const left = Math.min(unit === 'bytes' ? 76 : 60, width * 0.3);
   const plot = Math.max(1, width - left - 16);
   const x = (value) =>
     left + ((value - start) / Math.max(1, end - start)) * plot;
@@ -127,14 +127,14 @@ function TimeSeries({ series, unit }) {
         role="group"
         aria-label="Gráfico de métricas. Usá las flechas para recorrer el tiempo."
         onKeyDown={(event) => {
-          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
             event.preventDefault();
             setHover((value) =>
               Math.max(
                 0,
                 Math.min(
                   1,
-                  (value ?? 1) + (event.key === "ArrowLeft" ? -0.05 : 0.05),
+                  (value ?? 1) + (event.key === 'ArrowLeft' ? -0.05 : 0.05),
                 ),
               ),
             );
@@ -169,7 +169,7 @@ function TimeSeries({ series, unit }) {
               <text x={left - 9} y={29 + fraction * plotHeight} textAnchor="end">
                 {format(
                   maximum * (1 - fraction),
-                  unit === "up" ? "short" : unit,
+                  unit === 'up' ? 'short' : unit,
                 )}
               </text>
             </g>
@@ -180,13 +180,13 @@ function TimeSeries({ series, unit }) {
               .map(([timestamp, value]) => {
                 if (value == null) {
                   gap = true;
-                  return "";
+                  return '';
                 }
-                const command = gap ? "M" : "L";
+                const command = gap ? 'M' : 'L';
                 gap = false;
                 return `${command}${x(timestamp).toFixed(2)},${y(value).toFixed(2)}`;
               })
-              .join(" ");
+              .join(' ');
             return (
               <path
                 key={seriesName(item.labels)}
@@ -203,7 +203,7 @@ function TimeSeries({ series, unit }) {
               x={left + point * plot}
               y={height - 10}
               textAnchor={
-                point === 0 ? "start" : point === 1 ? "end" : "middle"
+                point === 0 ? 'start' : point === 1 ? 'end' : 'middle'
               }
             >
               {clock(start + point * (end - start))}
@@ -246,7 +246,7 @@ function TimeSeries({ series, unit }) {
                   ? !!selectedContainer
                   : !hidden.has(name)
               }
-              className={hidden.has(name) ? "is-hidden" : ""}
+              className={hidden.has(name) ? 'is-hidden' : ''}
               onClick={() => {
                 if (item.labels.id || item.labels.name || item.labels.service || item.labels.container_label_com_docker_compose_service) {
                   const labels = item.labels.service
@@ -254,7 +254,7 @@ function TimeSeries({ series, unit }) {
                     : item.labels;
                   const key = containerKey(labels);
                   selectContainer(
-                    selectedContainer && matchesContainer(labels, selectedContainer) ? "" : key,
+                    selectedContainer && matchesContainer(labels, selectedContainer) ? '' : key,
                   );
                   return;
                 }
@@ -275,7 +275,7 @@ function TimeSeries({ series, unit }) {
             className="mon-expand-series"
             onClick={() => setExpanded(!expanded)}
           >
-            {expanded ? "Mostrar menos" : `Ver las ${series.length} series`}
+            {expanded ? 'Mostrar menos' : `Ver las ${series.length} series`}
           </button>
         )}
       </div>
@@ -295,7 +295,7 @@ function TimeSeries({ series, unit }) {
                 <tr key={seriesName(item.labels)}>
                   <td>{seriesName(item.labels)}</td>
                   <td>
-                    {item.points.length ? clock(item.points.at(-1)[0]) : "—"}
+                    {item.points.length ? clock(item.points.at(-1)[0]) : '—'}
                   </td>
                   <td>{format(item.points.at(-1)?.[1], unit)}</td>
                 </tr>
@@ -318,7 +318,7 @@ export function MetricPanel({ name, title, description, panel = null }) {
         const labels = item.labels;
         const matches = labels.id || labels.name || labels.container_label_com_docker_compose_service
           ? matchesContainer(labels, selectedContainer)
-          : name === "availability"
+          : name === 'availability'
             ? matchesContainer({ name: serviceContainer(labels.service) }, selectedContainer)
             : true;
         return matches && item.points.some((point) => point[1] != null);
@@ -326,19 +326,19 @@ export function MetricPanel({ name, title, description, panel = null }) {
     [data, selectedContainer, name],
   );
   return (
-    <ChartPanel title={title || data?.title || "Métrica"} className="mon-metric-panel">
+    <ChartPanel title={title || data?.title || 'Métrica'} className="mon-metric-panel">
       <PanelHeader
-        title={title || data?.title || "Métrica"}
+        title={title || data?.title || 'Métrica'}
         description={
-          description || "Series observadas en el período seleccionado"
+          description || 'Series observadas en el período seleccionado'
         }
       >
         <span className="obs-subtle-tag">
           {error && data
-            ? "Dato anterior"
+            ? 'Dato anterior'
             : loading
-              ? "Actualizando"
-              : data?.source || "Prometheus"}
+              ? 'Actualizando'
+              : data?.source || 'Prometheus'}
         </span>
       </PanelHeader>
       {error && (
@@ -358,14 +358,14 @@ export function MetricPanel({ name, title, description, panel = null }) {
         <Empty
           icon="chart"
           title={
-            error ? "Fuente no disponible" : "Sin muestras en este período"
+            error ? 'Fuente no disponible' : 'Sin muestras en este período'
           }
         >
           {error
-            ? "Las otras secciones continúan disponibles."
+            ? 'Las otras secciones continúan disponibles.'
             : selectedContainer
-              ? "No hay muestras para el contenedor seleccionado en este período."
-              : "No hay muestras disponibles para este período."}
+              ? 'No hay muestras para el contenedor seleccionado en este período.'
+              : 'No hay muestras disponibles para este período.'}
         </Empty>
       )}
     </ChartPanel>

@@ -1,16 +1,16 @@
-import React from "react";
-import { Empty, PanelHeader } from "../tracing/components";
-import { format } from "./charts";
-import { containerKey, containerName, matchesContainer } from "./containers";
-import { useMetric, useMonitoring } from "./useMonitoring";
+import React from 'react';
+import { Empty, PanelHeader } from '../../audit/tracing/components';
+import { format } from './charts';
+import { containerKey, containerName, matchesContainer } from './containers';
+import { useMetric, useMonitoring } from './useMonitoring';
 
 // La tabla conserva todas las opciones aunque los gráficos estén filtrados.
 export default function ContainerTable() {
-  const cpu = useMetric("cpu");
-  const memory = useMetric("memory");
+  const cpu = useMetric('cpu');
+  const memory = useMetric('memory');
   const { selectedContainer, selectContainer } = useMonitoring();
   const containers = new Map();
-  for (const [metric, state] of [["cpu", cpu], ["memory", memory]]) {
+  for (const [metric, state] of [['cpu', cpu], ['memory', memory]]) {
     for (const series of state.data?.series || []) {
       const key = containerKey(series.labels);
       if (!key) continue;
@@ -20,7 +20,7 @@ export default function ContainerTable() {
     }
   }
   const rows = [...containers.values()].sort((a, b) =>
-    containerName(a.key).localeCompare(containerName(b.key), "es"),
+    containerName(a.key).localeCompare(containerName(b.key), 'es'),
   );
   return (
     <section className="obs-panel">
@@ -30,7 +30,7 @@ export default function ContainerTable() {
       >
         <button
           className="obs-btn obs-btn-secondary"
-          onClick={() => selectContainer("")}
+          onClick={() => selectContainer('')}
           disabled={!selectedContainer}
         >
           Ver todos
@@ -39,7 +39,7 @@ export default function ContainerTable() {
       {(cpu.error || memory.error) && (
         <p className="mon-inline-error" role="status">
           {cpu.error || memory.error}
-          {rows.length > 0 && " Se muestran los últimos datos disponibles."}
+          {rows.length > 0 && ' Se muestran los últimos datos disponibles.'}
         </p>
       )}
       {rows.length ? (
@@ -57,19 +57,19 @@ export default function ContainerTable() {
               {rows.map((row) => {
                 const active = !!selectedContainer && matchesContainer(row.labels, selectedContainer);
                 return (
-                  <tr key={row.key} className={active ? "mon-selected-row" : ""}>
+                  <tr key={row.key} className={active ? 'mon-selected-row' : ''}>
                     <td>
                       <button
                         className="mon-container-button"
                         aria-pressed={active}
-                        onClick={() => selectContainer(active ? "" : row.key)}
+                        onClick={() => selectContainer(active ? '' : row.key)}
                       >
                         {containerName(row.key)}
                       </button>
                     </td>
-                    <td>{format(row.cpu, "percent")}</td>
-                    <td>{format(row.memory, "bytes")}</td>
-                    <td>{active ? "Seleccionado" : "—"}</td>
+                    <td>{format(row.cpu, 'percent')}</td>
+                    <td>{format(row.memory, 'bytes')}</td>
+                    <td>{active ? 'Seleccionado' : '—'}</td>
                   </tr>
                 );
               })}
@@ -78,11 +78,11 @@ export default function ContainerTable() {
         </div>
       ) : (
         <Empty
-          title={cpu.loading || memory.loading ? "Cargando contenedores…" : "Sin datos de contenedores"}
+          title={cpu.loading || memory.loading ? 'Cargando contenedores…' : 'Sin datos de contenedores'}
           icon="services"
         >
           {!cpu.loading && !memory.loading &&
-            "cAdvisor debe poder consultar Docker y publicar los nombres de los contenedores. Después de reiniciarlo, esperá las primeras muestras de Prometheus."}
+            'cAdvisor debe poder consultar Docker y publicar los nombres de los contenedores. Después de reiniciarlo, esperá las primeras muestras de Prometheus.'}
         </Empty>
       )}
     </section>

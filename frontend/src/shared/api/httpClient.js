@@ -9,6 +9,9 @@ export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
 const fromSession = async () => sessionStore.get()?.token;
 let tokenProvider = fromSession;
 export const setTokenProvider = (fn) => { tokenProvider = fn ?? fromSession; };
+// Para clientes que hablan con otro backend (ej. la Central de Monitoreo, cruzando origen):
+// mismo token de sesión, sin repetir la lógica de a quién pedírselo.
+export const currentToken = () => tokenProvider();
 
 export class ApiError extends Error {
   // `field` (opcional) indica qué campo del formulario originó el error, ej. 'email'.

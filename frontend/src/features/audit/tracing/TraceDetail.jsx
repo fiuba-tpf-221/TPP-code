@@ -1,8 +1,8 @@
-import { ChartPanel } from "../ChartPanel";
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { getTrace, nativeUrl } from "./api";
-import { Empty, Icon, Metric, PanelHeader, StatusBadge } from "./components";
+import { ChartPanel } from '../../../shared/components/ChartPanel';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { getTrace, nativeUrl } from './api';
+import { Empty, Icon, Metric, PanelHeader, StatusBadge } from './components';
 import {
   dateTime,
   duration,
@@ -12,15 +12,15 @@ import {
   spanKind,
   spanRows,
   summarize,
-} from "./model";
-import { useTracing } from "./useTracing";
+} from './model';
+import { useTracing } from './useTracing';
 
 // Convierte un atributo escalar o compuesto a texto legible.
 const valueText = (value) =>
-  typeof value === "object" ? JSON.stringify(value) : String(value);
+  typeof value === 'object' ? JSON.stringify(value) : String(value);
 
 // Filtra y presenta los atributos del span o proceso seleccionado.
-function AttributeTable({ values = [], search = "" }) {
+function AttributeTable({ values = [], search = '' }) {
   const rows = values.filter((item) =>
     `${item.key} ${valueText(item.value)}`
       .toLowerCase()
@@ -30,8 +30,8 @@ function AttributeTable({ values = [], search = "" }) {
     return (
       <p className="obs-detail-empty">
         {search
-          ? "No hay atributos que coincidan."
-          : "Sin atributos registrados."}
+          ? 'No hay atributos que coincidan.'
+          : 'Sin atributos registrados.'}
       </p>
     );
   return (
@@ -48,11 +48,11 @@ function AttributeTable({ values = [], search = "" }) {
 
 // Muestra atributos, eventos y servicio del span seleccionado.
 function SpanDetails({ trace, span }) {
-  const [tab, setTab] = useState("attributes");
-  const [search, setSearch] = useState("");
+  const [tab, setTab] = useState('attributes');
+  const [search, setSearch] = useState('');
   useEffect(() => {
-    setTab("attributes");
-    setSearch("");
+    setTab('attributes');
+    setSearch('');
   }, [span.spanID]);
   const process = trace.processes?.[span.processID];
   return (
@@ -94,9 +94,9 @@ function SpanDetails({ trace, span }) {
         aria-label="Información del span"
       >
         {[
-          ["attributes", "Atributos"],
-          ["events", "Eventos"],
-          ["service", "Servicio"],
+          ['attributes', 'Atributos'],
+          ['events', 'Eventos'],
+          ['service', 'Servicio'],
         ].map(([id, label]) => (
           <button
             key={id}
@@ -105,13 +105,13 @@ function SpanDetails({ trace, span }) {
             aria-selected={tab === id}
             aria-controls="obs-span-tabpanel"
             tabIndex={tab === id ? 0 : -1}
-            className={tab === id ? "active" : ""}
+            className={tab === id ? 'active' : ''}
             onKeyDown={(event) => {
-              const ids = ["attributes", "events", "service"];
+              const ids = ['attributes', 'events', 'service'];
               const direction =
-                event.key === "ArrowRight"
+                event.key === 'ArrowRight'
                   ? 1
-                  : event.key === "ArrowLeft"
+                  : event.key === 'ArrowLeft'
                     ? -1
                     : 0;
               if (direction) {
@@ -125,7 +125,7 @@ function SpanDetails({ trace, span }) {
             onClick={() => setTab(id)}
           >
             {label}
-            {id === "events" && <span>{(span.logs || []).length}</span>}
+            {id === 'events' && <span>{(span.logs || []).length}</span>}
           </button>
         ))}
       </div>
@@ -135,7 +135,7 @@ function SpanDetails({ trace, span }) {
         role="tabpanel"
         aria-labelledby={`obs-tab-${tab}`}
       >
-        {tab === "attributes" && (
+        {tab === 'attributes' && (
           <>
             <label className="obs-search-field obs-attribute-search">
               <Icon name="search" size={15} />
@@ -149,7 +149,7 @@ function SpanDetails({ trace, span }) {
             <AttributeTable values={span.tags} search={search} />
           </>
         )}
-        {tab === "events" &&
+        {tab === 'events' &&
           (!(span.logs || []).length ? (
             <p className="obs-detail-empty">
               Este span no tiene eventos registrados.
@@ -166,10 +166,10 @@ function SpanDetails({ trace, span }) {
               ))}
             </ol>
           ))}
-        {tab === "service" && (
+        {tab === 'service' && (
           <>
             <p className="obs-resource-name">
-              {process?.serviceName || "Sin servicio"}
+              {process?.serviceName || 'Sin servicio'}
             </p>
             <AttributeTable values={process?.tags} />
           </>
@@ -185,7 +185,7 @@ function Waterfall({ trace }) {
     trace.root?.spanID || trace.spans[0]?.spanID,
   );
   const [collapsed, setCollapsed] = useState(new Set());
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [errorsOnly, setErrorsOnly] = useState(false);
   const [limit, setLimit] = useState(500);
   useEffect(() => {
@@ -278,7 +278,7 @@ function Waterfall({ trace }) {
                 return (
                   <div
                     key={row.span.spanID}
-                    className={`obs-waterfall-row ${selected === row.span.spanID ? "is-selected" : ""}`}
+                    className={`obs-waterfall-row ${selected === row.span.spanID ? 'is-selected' : ''}`}
                     data-span-id={row.span.spanID}
                   >
                     <div
@@ -289,8 +289,8 @@ function Waterfall({ trace }) {
                     >
                       {row.children ? (
                         <button
-                          className={`obs-collapse ${collapsed.has(row.span.spanID) ? "" : "is-open"}`}
-                          aria-label={`${collapsed.has(row.span.spanID) ? "Expandir" : "Contraer"} ${row.span.operationName}`}
+                          className={`obs-collapse ${collapsed.has(row.span.spanID) ? '' : 'is-open'}`}
+                          aria-label={`${collapsed.has(row.span.spanID) ? 'Expandir' : 'Contraer'} ${row.span.operationName}`}
                           aria-expanded={!collapsed.has(row.span.spanID)}
                           onClick={() =>
                             setCollapsed((previous) => {
@@ -314,7 +314,7 @@ function Waterfall({ trace }) {
                         title={`${row.span.operationName} · ${serviceOf(trace, row.span)}`}
                       >
                         <span
-                          className={`obs-service-mark ${failed ? "is-error" : ""}`}
+                          className={`obs-service-mark ${failed ? 'is-error' : ''}`}
                         />
                         <span>
                           <strong>{row.span.operationName}</strong>
@@ -329,7 +329,7 @@ function Waterfall({ trace }) {
                       onClick={() => setSelected(row.span.spanID)}
                     >
                       <span
-                        className={`obs-span-bar ${failed ? "is-error" : ""} ${spanKind(row.span) === "client" ? "is-client" : ""}`}
+                        className={`obs-span-bar ${failed ? 'is-error' : ''} ${spanKind(row.span) === 'client' ? 'is-client' : ''}`}
                         style={{ left: `${left}%`, width: `${width}%` }}
                         title={`Inicio +${duration(row.span.startTime - trace.start)} · Duración ${duration(row.span.duration)}`}
                       />
@@ -346,12 +346,12 @@ function Waterfall({ trace }) {
                 className="obs-btn obs-btn-secondary obs-show-more"
                 onClick={() => setLimit(limit + 500)}
               >
-                Mostrar los siguientes {Math.min(500, visible.length - limit)}{" "}
+                Mostrar los siguientes {Math.min(500, visible.length - limit)}{' '}
                 spans
               </button>
             )}
             <p className="obs-waterfall-note">
-              {number(Math.min(limit, visible.length))} de{" "}
+              {number(Math.min(limit, visible.length))} de{' '}
               {number(trace.spans.length)} spans visibles. Los tiempos de spans
               anidados se superponen.
             </p>
@@ -372,18 +372,18 @@ export default function TraceDetail() {
     trace: null,
     source: null,
     loading: true,
-    error: "",
+    error: '',
   });
-  const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState('');
   useEffect(() => {
     const controller = new AbortController();
-    setState({ trace: null, source: null, loading: true, error: "" });
+    setState({ trace: null, source: null, loading: true, error: '' });
     if (!/^(?:[0-9a-f]{16}|[0-9a-f]{32})$/i.test(traceId)) {
       setState({
         trace: null,
         source: null,
         loading: false,
-        error: "El Trace ID debe contener 16 o 32 caracteres hexadecimales.",
+        error: 'El Trace ID debe contener 16 o 32 caracteres hexadecimales.',
       });
       return () => controller.abort();
     }
@@ -392,19 +392,19 @@ export default function TraceDetail() {
         if (controller.signal.aborted) return;
         const source = data.find(
           (item) =>
-            typeof item.traceID === "string" &&
-            item.traceID.toLowerCase().padStart(32, "0") ===
-              traceId.toLowerCase().padStart(32, "0"),
+            typeof item.traceID === 'string' &&
+            item.traceID.toLowerCase().padStart(32, '0') ===
+              traceId.toLowerCase().padStart(32, '0'),
         );
         if (!source?.spans?.length)
           throw new Error(
-            "Esta traza no está disponible o ya expiró de la memoria de Jaeger.",
+            'Esta traza no está disponible o ya expiró de la memoria de Jaeger.',
           );
         setState({
           trace: summarize(source),
           source,
           loading: false,
-          error: "",
+          error: '',
         });
       })
       .catch((error) => {
@@ -420,7 +420,7 @@ export default function TraceDetail() {
   }, [traceId, revision]);
   useEffect(() => {
     if (!notice) return undefined;
-    const timer = setTimeout(() => setNotice(""), 4000);
+    const timer = setTimeout(() => setNotice(''), 4000);
     return () => clearTimeout(timer);
   }, [notice]);
 
@@ -428,20 +428,20 @@ export default function TraceDetail() {
   async function copy() {
     try {
       await navigator.clipboard.writeText(traceId);
-      setNotice("Trace ID copiado");
+      setNotice('Trace ID copiado');
     } catch {
       setNotice(
-        "No se pudo copiar. Podés seleccionar el Trace ID directamente.",
+        'No se pudo copiar. Podés seleccionar el Trace ID directamente.',
       );
     }
   }
   // Exporta el JSON original y libera la URL temporal de descarga.
   function download() {
     const blob = new Blob([JSON.stringify({ data: [state.source] }, null, 2)], {
-      type: "application/json",
+      type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
     link.download = `trace-${traceId}.json`;
     link.click();
@@ -450,16 +450,16 @@ export default function TraceDetail() {
   const { trace, loading, error } = state;
   return (
     <>
-      <Link className="obs-back" to={`/traces?${params}`}>
+      <Link className="obs-back" to={`/auditoria/explorar?${params}`}>
         <Icon name="arrow" size={15} />
         Volver a las trazas
       </Link>
       <div className="obs-page-header obs-trace-header">
         <div>
           <div className="obs-eyebrow">
-            OBSERVABILIDAD <span>/</span> DETALLE DE TRAZA
+            AUDITORÍA <span>/</span> DETALLE DE TRAZA
           </div>
-          <h1>{trace?.name || "Detalle de traza"}</h1>
+          <h1>{trace?.name || 'Detalle de traza'}</h1>
           <div className="obs-trace-id">
             <code>{traceId}</code>
             <button

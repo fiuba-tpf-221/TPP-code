@@ -4,14 +4,13 @@ import App from './App';
 import { authService } from '../features/auth/authService';
 import { sessionStore } from '../shared/utils/session';
 import { touch } from '../shared/session/activity';
-import { FEATURES } from '../config/features';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 let container;
 let root;
-beforeEach(() => { FEATURES.SIMULATE_INFRA = true; /* el ambiente controlado por defecto */ localStorage.clear(); container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container); });
-afterEach(() => { FEATURES.SIMULATE_INFRA = false; act(() => root.unmount()); container.remove(); window.history.replaceState(null, '', '/'); });
+beforeEach(() => { localStorage.clear(); container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container); });
+afterEach(() => { act(() => root.unmount()); container.remove(); window.history.replaceState(null, '', '/'); });
 
 // Abre la app en una ruta y espera a que terminen las respuestas simuladas.
 const open = async (path) => {
@@ -54,7 +53,6 @@ describe('con el administrador de demostración, todas las pestañas levantan', 
     ['/roles', 'Nuevo rol'],
     ['/roles/nuevo', 'Permisos asociados'],
     ['/dominios', 'en construcción'],
-    ['/auditoria', 'en construcción'],
     ['/modelos', 'en construcción'],
     ['/prediccion', 'en construcción'],
   ])('%s carga', async (path, expected) => {
@@ -64,12 +62,20 @@ describe('con el administrador de demostración, todas las pestañas levantan', 
     expect(text()).not.toContain('Sin acceso');
   });
 
-  test('Sistema funciona simulado: seis tarjetas, seis consolas y el selector de escenarios', async () => {
+  test('Sistema muestra Vista General y el sub-índice de secciones', async () => {
     await open('/sistema');
-    expect(container.querySelectorAll('.svc-card')).toHaveLength(6);
-    expect(container.querySelectorAll('a.console')).toHaveLength(6);
-    expect(container.querySelector('#sim-scenario')).not.toBeNull();
-    expect(container.querySelectorAll('.svc-badge--ok')).toHaveLength(6);
+    expect(text()).toContain('Vista General');
+    expect([...container.querySelectorAll('.subnav a')].map((a) => a.textContent)).toEqual([
+      'Vista General', 'Infraestructura', 'PostgreSQL', 'OpenTelemetry', 'Dashboards',
+    ]);
+  });
+
+  test('Auditoría muestra Resumen de trazas y el sub-índice de secciones', async () => {
+    await open('/auditoria');
+    expect(text()).toContain('Resumen de trazas');
+    expect([...container.querySelectorAll('.subnav a')].map((a) => a.textContent)).toEqual([
+      'Resumen de trazas', 'Explorar trazas', 'Servicios de trazas',
+    ]);
   });
 
   test('el detalle de un usuario abre desde la lista', async () => {

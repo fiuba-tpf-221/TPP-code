@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { getOperations } from "./api";
-import { activity, dateTime, duration, number, RANGES, time } from "./model";
-import { useTracing } from "./useTracing";
-import { ChartPanel, ChartExpandButton } from "../ChartPanel";
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getOperations } from './api';
+import { activity, dateTime, duration, number, RANGES, time } from './model';
+import { useTracing } from './useTracing';
+import { ChartExpandButton, ChartPanel } from '../../../shared/components/ChartPanel';
 
 const paths = {
   overview: (
@@ -88,7 +88,7 @@ const paths = {
 };
 
 // Renderiza un icono del catálogo visual compartido.
-export function Icon({ name, size = 18, className = "" }) {
+export function Icon({ name, size = 18, className = '' }) {
   return (
     <svg
       className={className}
@@ -110,18 +110,18 @@ export function Icon({ name, size = 18, className = "" }) {
 // Identifica visualmente si una traza o span registró errores.
 export function StatusBadge({ error, label }) {
   return (
-    <span className={`obs-badge ${error ? "is-error" : "is-success"}`}>
+    <span className={`obs-badge ${error ? 'is-error' : 'is-success'}`}>
       <span className="obs-status-dot" />
-      {label || (error ? "Con errores" : "Sin errores")}
+      {label || (error ? 'Con errores' : 'Sin errores')}
     </span>
   );
 }
 
 // Presenta un estado sin resultados con su explicación.
 export function Empty({
-  title = "Todavía no hay trazas",
+  title = 'Todavía no hay trazas',
   children,
-  icon = "trace",
+  icon = 'trace',
 }) {
   return (
     <div className="obs-empty">
@@ -131,7 +131,7 @@ export function Empty({
       <h3>{title}</h3>
       <p>
         {children ||
-          "Generá una solicitud en la aplicación o ampliá el período de búsqueda."}
+          'Generá una solicitud en la aplicación o ampliá el período de búsqueda.'}
       </p>
     </div>
   );
@@ -167,7 +167,7 @@ export function QueryState() {
 // Presenta un indicador y el alcance de su valor.
 export function Metric({ label, value, description, icon, accent = false }) {
   return (
-    <article className={`obs-metric ${accent ? "is-accent" : ""}`}>
+    <article className={`obs-metric ${accent ? 'is-accent' : ''}`}>
       <div className="obs-metric-label">
         {label}
         <Icon name={icon} size={17} />
@@ -213,7 +213,7 @@ export function FilterBar() {
             [
               ...new Set(
                 data
-                  .map((item) => (typeof item === "string" ? item : item.name))
+                  .map((item) => (typeof item === 'string' ? item : item.name))
                   .filter(Boolean),
               ),
             ].sort(),
@@ -233,8 +233,8 @@ export function FilterBar() {
         event.preventDefault();
         updateParams({
           ...draft,
-          minDuration: draft.minDuration || "",
-          page: "",
+          minDuration: draft.minDuration || '',
+          page: '',
         });
       }}
     >
@@ -245,13 +245,13 @@ export function FilterBar() {
           type="button"
           className="obs-reset-filters"
           onClick={() => {
-            setDraft({ ...filters, operation: "", status: "", minDuration: 0 });
+            setDraft({ ...filters, operation: '', status: '', minDuration: 0 });
             updateParams({
-              operation: "",
-              status: "",
-              minDuration: "",
-              q: "",
-              sort: "",
+              operation: '',
+              status: '',
+              minDuration: '',
+              q: '',
+              sort: '',
             });
           }}
         >
@@ -264,7 +264,7 @@ export function FilterBar() {
           <select
             value={draft.service}
             onChange={(event) =>
-              setDraft({ ...draft, service: event.target.value, operation: "" })
+              setDraft({ ...draft, service: event.target.value, operation: '' })
             }
           >
             {available.map((service) => (
@@ -324,7 +324,7 @@ export function FilterBar() {
               min="0"
               step="any"
               placeholder="0"
-              value={draft.minDuration || ""}
+              value={draft.minDuration || ''}
               onChange={(event) =>
                 setDraft({ ...draft, minDuration: event.target.value })
               }
@@ -343,8 +343,8 @@ export function FilterBar() {
       </div>
       {(serviceError || operationsError) && (
         <p className="obs-filter-note">
-          No pudimos actualizar{" "}
-          {serviceError ? "la lista de servicios" : "la lista de operaciones"}.
+          No pudimos actualizar{' '}
+          {serviceError ? 'la lista de servicios' : 'la lista de operaciones'}.
           Podés volver a buscar.
         </p>
       )}
@@ -355,12 +355,12 @@ export function FilterBar() {
 // Agrupa la muestra temporalmente para comparar actividad y latencia.
 export function ActivityChart({ traces, window }) {
   const buckets = useMemo(() => activity(traces, window), [traces, window]);
-  const [mode, setMode] = useState("volume");
+  const [mode, setMode] = useState('volume');
   const [hover, setHover] = useState(null);
   const maximum = Math.max(
     1,
     ...buckets.map((bucket) =>
-      mode === "volume" ? bucket.count : bucket.p95 || 0,
+      mode === 'volume' ? bucket.count : bucket.p95 || 0,
     ),
   );
   const height = 150;
@@ -378,20 +378,20 @@ export function ActivityChart({ traces, window }) {
           aria-label="Medición del gráfico"
         >
           <button
-            className={mode === "volume" ? "active" : ""}
-            aria-pressed={mode === "volume"}
+            className={mode === 'volume' ? 'active' : ''}
+            aria-pressed={mode === 'volume'}
             onClick={() => {
-              setMode("volume");
+              setMode('volume');
               setHover(null);
             }}
           >
             Volumen
           </button>
           <button
-            className={mode === "latency" ? "active" : ""}
-            aria-pressed={mode === "latency"}
+            className={mode === 'latency' ? 'active' : ''}
+            aria-pressed={mode === 'latency'}
             onClick={() => {
-              setMode("latency");
+              setMode('latency');
               setHover(null);
             }}
           >
@@ -406,9 +406,9 @@ export function ActivityChart({ traces, window }) {
           <div className="obs-chart-legend">
             <span>
               <i className="obs-key" />
-              {mode === "volume" ? "Trazas recuperadas" : "Latencia p95"}
+              {mode === 'volume' ? 'Trazas recuperadas' : 'Latencia p95'}
             </span>
-            {mode === "volume" && (
+            {mode === 'volume' && (
               <span>
                 <i className="obs-key is-error" />
                 Con errores
@@ -416,15 +416,15 @@ export function ActivityChart({ traces, window }) {
             )}
             <span className="obs-chart-readout" aria-live="polite">
               {hover != null
-                ? `${time(buckets[hover].start * 1000)} — ${mode === "volume" ? `${buckets[hover].count} trazas · ${buckets[hover].errors} con errores` : duration(buckets[hover].p95)}`
-                : "Explorá los intervalos del gráfico"}
+                ? `${time(buckets[hover].start * 1000)} — ${mode === 'volume' ? `${buckets[hover].count} trazas · ${buckets[hover].errors} con errores` : duration(buckets[hover].p95)}`
+                : 'Explorá los intervalos del gráfico'}
             </span>
           </div>
           <svg
             className="obs-activity-chart"
             viewBox="0 0 820 205"
             role="img"
-            aria-label={`Actividad: ${mode === "volume" ? "cantidad de trazas" : "latencia p95"} por intervalo`}
+            aria-label={`Actividad: ${mode === 'volume' ? 'cantidad de trazas' : 'latencia p95'} por intervalo`}
           >
             {[0, 0.5, 1].map((fraction) => (
               <g key={fraction}>
@@ -436,14 +436,14 @@ export function ActivityChart({ traces, window }) {
                   className="obs-grid-line"
                 />
                 <text x="37" y={16 + height * fraction} textAnchor="end">
-                  {mode === "volume"
+                  {mode === 'volume'
                     ? Math.round(maximum * (1 - fraction))
                     : duration(maximum * (1 - fraction))}
                 </text>
               </g>
             ))}
             {buckets.map((bucket, index) => {
-              const value = mode === "volume" ? bucket.count : bucket.p95 || 0;
+              const value = mode === 'volume' ? bucket.count : bucket.p95 || 0;
               const barHeight = (value / maximum) * height;
               const errorHeight = (bucket.errors / maximum) * height;
               return (
@@ -462,7 +462,7 @@ export function ActivityChart({ traces, window }) {
                     y="12"
                     width={slot}
                     height={height}
-                    fill={hover === index ? "#edf5f3" : "transparent"}
+                    fill={hover === index ? '#edf5f3' : 'transparent'}
                   />
                   <rect
                     x={55 + index * slot}
@@ -472,7 +472,7 @@ export function ActivityChart({ traces, window }) {
                     rx="3"
                     className="obs-chart-bar"
                   />
-                  {mode === "volume" && errorHeight > 0 && (
+                  {mode === 'volume' && errorHeight > 0 && (
                     <rect
                       x={55 + index * slot}
                       y={12 + height - errorHeight}
@@ -488,10 +488,10 @@ export function ActivityChart({ traces, window }) {
                       y="188"
                       textAnchor="middle"
                     >
-                      {new Date(bucket.start).toLocaleTimeString("es-AR", {
-                        hourCycle: "h23",
-                        hour: "2-digit",
-                        minute: "2-digit",
+                      {new Date(bucket.start).toLocaleTimeString('es-AR', {
+                        hourCycle: 'h23',
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })}
                     </text>
                   )}
@@ -573,10 +573,10 @@ export function TraceTable({ traces, compact = false }) {
                 <td>
                   <Link
                     className="obs-trace-link"
-                    to={`/traces/${trace.traceID}?${params}`}
+                    to={`/auditoria/trazas/${trace.traceID}?${params}`}
                   >
                     <span
-                      className={`obs-service-mark ${trace.errors ? "is-error" : ""}`}
+                      className={`obs-service-mark ${trace.errors ? 'is-error' : ''}`}
                     />
                     <span>
                       <strong>{trace.name}</strong>
@@ -595,7 +595,7 @@ export function TraceTable({ traces, compact = false }) {
                     <strong>{duration(trace.duration)}</strong>
                     <span>
                       <i
-                        className={trace.errors ? "is-error" : ""}
+                        className={trace.errors ? 'is-error' : ''}
                         style={{
                           width: `${Math.max(2, (trace.duration / maximum) * 100)}%`,
                         }}
@@ -610,7 +610,7 @@ export function TraceTable({ traces, compact = false }) {
                 <td>
                   <Link
                     className="obs-icon-link"
-                    to={`/traces/${trace.traceID}?${params}`}
+                    to={`/auditoria/trazas/${trace.traceID}?${params}`}
                     aria-label={`Abrir traza ${trace.traceID}`}
                   >
                     <Icon name="arrow" size={17} />
@@ -625,7 +625,7 @@ export function TraceTable({ traces, compact = false }) {
         <div className="obs-pagination">
           <span>
             {number((current - 1) * pageSize + 1)}–
-            {number(Math.min(current * pageSize, traces.length))} de{" "}
+            {number(Math.min(current * pageSize, traces.length))} de{' '}
             {number(traces.length)} trazas
           </span>
           <div>

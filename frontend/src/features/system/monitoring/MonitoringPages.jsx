@@ -1,24 +1,28 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Empty, Icon, Metric, PanelHeader } from "../tracing/components";
-import { RANGES } from "../tracing/model";
-import { format, MetricPanel } from "./charts";
-import { useMonitoring, useRemote } from "./useMonitoring";
-import "./monitoring.css";
-import ContainerTable from "./ContainerTable";
-import TelemetrySummary from "./TelemetrySummary";
-import { ChartPanel } from "../ChartPanel";
-import { containerName, serviceContainer } from "./containers";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import ConsoleIcon from '../../../shared/components/icons';
+import { CONSOLES } from '../../../config/services';
+import { Empty, Icon, Metric, PanelHeader } from '../../audit/tracing/components';
+import { RANGES } from '../../audit/tracing/model';
+import '../../audit/tracing/tracing.css';
+import { format, MetricPanel } from './charts';
+import { useMonitoring, useRemote } from './useMonitoring';
+import './monitoring.css';
+import '../system.css';
+import ContainerTable from './ContainerTable';
+import TelemetrySummary from './TelemetrySummary';
+import { ChartPanel } from '../../../shared/components/ChartPanel';
+import { containerName, serviceContainer } from './containers';
 
 // Distingue una fuente disponible, no saludable o sin observación actual.
 export function SourceStatus({ up, stale = false }) {
   const unknown = up == null || stale;
   return (
     <span
-      className={`obs-badge ${unknown ? "mon-unknown" : up ? "is-success" : "is-error"}`}
+      className={`obs-badge ${unknown ? 'mon-unknown' : up ? 'is-success' : 'is-error'}`}
     >
       <span className="obs-status-dot" />
-      {unknown ? "Sin dato actual" : up ? "Disponible" : "No saludable"}
+      {unknown ? 'Sin dato actual' : up ? 'Disponible' : 'No saludable'}
     </span>
   );
 }
@@ -52,15 +56,15 @@ export function MonitoringHeader({ section, title, description }) {
     <div className="obs-page-header">
       <div>
         <div className="obs-eyebrow">
-          CENTRAL DE MONITOREO <span>/</span>
+          SISTEMA <span>/</span>
           {section}
         </div>
         <h1>{title}</h1>
         <p>{description}</p>
       </div>
       <div className="obs-query-toolbar">
-        {selectedContainer && ["RESUMEN", "INFRAESTRUCTURA", "GRAFANA"].includes(section) && (
-          <button className="obs-btn obs-btn-secondary mon-active-filter" onClick={() => selectContainer("")} aria-label="Quitar filtro de contenedor">
+        {selectedContainer && ['RESUMEN', 'INFRAESTRUCTURA', 'GRAFANA'].includes(section) && (
+          <button className="obs-btn obs-btn-secondary mon-active-filter" onClick={() => selectContainer('')} aria-label="Quitar filtro de contenedor">
             {containerName(selectedContainer)} · Quitar filtro
           </button>
         )}
@@ -108,10 +112,10 @@ export function MonitoringNotice() {
     <div className="mon-observation" role="status">
       <Icon name="clock" size={14} />
       {error
-        ? "La central no pudo actualizar sus fuentes. Se conserva la última observación disponible."
+        ? 'La central no pudo actualizar sus fuentes. Se conserva la última observación disponible.'
         : data?.checkedAt
-          ? `${stale ? "Observación desactualizada" : "Última observación"}: ${new Date(data.checkedAt * 1000).toLocaleTimeString("es-AR", { hourCycle: "h23" })}. Las sondas se ejecutan cada 15 segundos.`
-          : "Esperando la primera comprobación de servicios…"}
+          ? `${stale ? 'Observación desactualizada' : 'Última observación'}: ${new Date(data.checkedAt * 1000).toLocaleTimeString('es-AR', { hourCycle: 'h23' })}. Las sondas se ejecutan cada 15 segundos.`
+          : 'Esperando la primera comprobación de servicios…'}
     </div>
   );
 }
@@ -148,7 +152,7 @@ export function ServiceTable() {
                       onClick={() => {
                         const key = serviceContainer(service.id);
                         selectContainer(
-                          containerName(selectedContainer) === containerName(key) ? "" : key,
+                          containerName(selectedContainer) === containerName(key) ? '' : key,
                         );
                       }}
                     >
@@ -163,8 +167,8 @@ export function ServiceTable() {
                   </td>
                   <td>
                     {stale
-                      ? "—"
-                      : `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(service.latencyMs)} ms`}
+                      ? '—'
+                      : `${new Intl.NumberFormat('es-AR', { maximumFractionDigits: 1 }).format(service.latencyMs)} ms`}
                   </td>
                   <td>
                     <SourceStatus up={service.up} stale={stale} />
@@ -195,20 +199,20 @@ function Sources() {
       />
       <div className="mon-source-grid">
         {[
-          ["jaeger", "Jaeger", "Trazas y recorridos", "/tracing"],
-          ["prometheus", "Prometheus", "Series y recursos", "/infrastructure"],
-          ["collector", "OpenTelemetry", "Salud del Collector", "/telemetry"],
-          ["grafana", "Grafana", "Paneles aprovisionados", "/dashboards"],
+          ['jaeger', 'Jaeger', 'Trazas y recorridos', '/auditoria'],
+          ['prometheus', 'Prometheus', 'Series y recursos', '/sistema/infraestructura'],
+          ['collector', 'OpenTelemetry', 'Salud del Collector', '/sistema/opentelemetry'],
+          ['grafana', 'Grafana', 'Paneles aprovisionados', '/sistema/dashboards'],
         ].map(([id, name, description, url]) => (
           <Link className="mon-source" key={id} to={`${url}?${params}`}>
             <div>
               <Icon
                 name={
-                  id === "jaeger"
-                    ? "trace"
-                    : id === "grafana"
-                      ? "chart"
-                      : "services"
+                  id === 'jaeger'
+                    ? 'trace'
+                    : id === 'grafana'
+                      ? 'chart'
+                      : 'services'
                 }
                 size={20}
               />
@@ -247,24 +251,24 @@ export function MonitoringOverview() {
       <div className="obs-metrics">
         <Metric
           label="Servicios saludables"
-          value={stale ? "—" : `${online} / ${services.length}`}
+          value={stale ? '—' : `${online} / ${services.length}`}
           description="Resultado de las sondas configuradas"
           icon="services"
           accent
         />
         <Metric
           label="Requieren atención"
-          value={stale ? "—" : services.length - online}
+          value={stale ? '—' : services.length - online}
           description="Comprobaciones que no están saludables"
           icon="error"
         />
         <Metric
           label="Bases de datos"
-          value={format(bytes, "bytes")}
+          value={format(bytes, 'bytes')}
           description={
             database.available && !database.stale
               ? `${database.databases.length} bases · tamaño ocupado`
-              : "Consulta SQL no disponible"
+              : 'Consulta SQL no disponible'
           }
           icon="services"
         />
@@ -272,8 +276,8 @@ export function MonitoringOverview() {
           label="Targets de Prometheus"
           value={
             !stale && data?.prometheus?.available
-              ? `${targets.filter((item) => item.health === "up").length} / ${targets.length}`
-              : "—"
+              ? `${targets.filter((item) => item.health === 'up').length} / ${targets.length}`
+              : '—'
           }
           description="Exportadores y endpoints de recolección"
           icon="chart"
@@ -294,6 +298,24 @@ export function MonitoringOverview() {
       </div>
       <ContainerTable />
       <ServiceTable />
+      <section className="obs-panel">
+        <PanelHeader
+          title="Consolas de administración"
+          description="Acceso directo a la herramienta real (se abre en otra pestaña)"
+        />
+        <div className="console-grid">
+          {CONSOLES.map((c) => (
+            <a key={c.id} className="console" href={c.url} target="_blank" rel="noreferrer noopener">
+              <span className="console__icon"><ConsoleIcon name={c.icon} size={22} /></span>
+              <span>
+                <strong>{c.name} <span aria-hidden="true">↗</span></strong>
+                <small>{c.desc}</small>
+              </span>
+              <span className="obs-sr-only">(se abre en una pestaña nueva)</span>
+            </a>
+          ))}
+        </div>
+      </section>
     </>
   );
 }
@@ -351,12 +373,12 @@ export function Infrastructure() {
                       <code>{target.instance}</code>
                     </td>
                     <td>
-                      {new Date(target.lastScrape).toLocaleTimeString("es-AR", {
-                        hourCycle: "h23",
+                      {new Date(target.lastScrape).toLocaleTimeString('es-AR', {
+                        hourCycle: 'h23',
                       })}
                     </td>
                     <td>
-                      <SourceStatus up={target.health === "up"} stale={stale} />
+                      <SourceStatus up={target.health === 'up'} stale={stale} />
                     </td>
                   </tr>
                 ))}
@@ -383,18 +405,18 @@ function DatabaseStorage() {
       />
       <div className="obs-metrics mon-storage-metrics">
         {[
-          ["Capacidad total", "totalBytes", "Tamaño del sistema de archivos"],
-          ["Espacio ocupado", "usedBytes", available ? `${format(usedPercent, "percent")} del disco ocupado` : "Uso del sistema de archivos"],
-          ["Espacio libre", "freeBytes", "Bloques libres, incluidos los reservados"],
-          ["Disponible para PostgreSQL", "availableBytes", "Espacio libre sin bloques reservados"],
+          ['Capacidad total', 'totalBytes', 'Tamaño del sistema de archivos'],
+          ['Espacio ocupado', 'usedBytes', available ? `${format(usedPercent, 'percent')} del disco ocupado` : 'Uso del sistema de archivos'],
+          ['Espacio libre', 'freeBytes', 'Bloques libres, incluidos los reservados'],
+          ['Disponible para PostgreSQL', 'availableBytes', 'Espacio libre sin bloques reservados'],
         ].map(([label, key, description]) => (
           <Metric
             key={key}
             label={label}
-            value={format(available ? storage[key] : null, "bytes")}
-            description={stale ? "Sin dato actual" : description}
+            value={format(available ? storage[key] : null, 'bytes')}
+            description={stale ? 'Sin dato actual' : description}
             icon="services"
-            accent={key === "usedBytes"}
+            accent={key === 'usedBytes'}
           />
         ))}
       </div>
@@ -406,15 +428,15 @@ function DatabaseStorage() {
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={usedPercent}
-            aria-valuetext={`${format(storage.usedBytes, "bytes")} de ${format(storage.totalBytes, "bytes")}`}
+            aria-valuetext={`${format(storage.usedBytes, 'bytes')} de ${format(storage.totalBytes, 'bytes')}`}
           >
             <span style={{ width: `${Math.min(100, Math.max(0, usedPercent))}%` }} />
           </div>
-          <span>{format(usedPercent, "percent")} ocupado</span>
+          <span>{format(usedPercent, 'percent')} ocupado</span>
         </div>
       ) : (
         <p className="mon-inline-error" role="status">
-          {stale ? "No hay una medición actual del almacenamiento." : storage?.error || "Esperando la primera medición del volumen."}
+          {stale ? 'No hay una medición actual del almacenamiento.' : storage?.error || 'Esperando la primera medición del volumen.'}
         </p>
       )}
       <p className="mon-footnote">
@@ -449,13 +471,13 @@ export function Databases() {
           <div>
             <h3>
               {database.configured
-                ? "No se pudo actualizar PostgreSQL"
-                : "Falta configurar la lectura de PostgreSQL"}
+                ? 'No se pudo actualizar PostgreSQL'
+                : 'Falta configurar la lectura de PostgreSQL'}
             </h3>
             <p>
-              {database.error || "Esperando la primera consulta."}
+              {database.error || 'Esperando la primera consulta.'}
               {database.stale &&
-                " Se muestra la última observación válida, marcada como anterior."}
+                ' Se muestra la última observación válida, marcada como anterior.'}
             </p>
           </div>
         </div>
@@ -463,18 +485,18 @@ export function Databases() {
       <div className="obs-metrics">
         <Metric
           label="Tamaño de bases"
-          value={format(database.databases?.length ? total : null, "bytes")}
+          value={format(database.databases?.length ? total : null, 'bytes')}
           description={
-            database.stale ? "Dato anterior" : "Datos e índices ocupados"
+            database.stale ? 'Dato anterior' : 'Datos e índices ocupados'
           }
           icon="services"
           accent
         />
         <Metric
           label="Conexiones observadas"
-          value={database.databases?.length ? format(connections) : "—"}
+          value={database.databases?.length ? format(connections) : '—'}
           description={
-            database.stale ? "Dato anterior" : "Incluye la sesión de monitoreo"
+            database.stale ? 'Dato anterior' : 'Incluye la sesión de monitoreo'
           }
           icon="services"
         />
@@ -483,18 +505,18 @@ export function Databases() {
           value={format(database.maxConnections)}
           description={
             database.stale
-              ? "Dato anterior"
-              : "Configuración del servidor PostgreSQL"
+              ? 'Dato anterior'
+              : 'Configuración del servidor PostgreSQL'
           }
           icon="services"
         />
         <Metric
           label="Bases observadas"
-          value={database.databases?.length || "—"}
+          value={database.databases?.length || '—'}
           description={
             database.stale
-              ? "Dato anterior"
-              : "Bases conectables, sin templates"
+              ? 'Dato anterior'
+              : 'Bases conectables, sin templates'
           }
           icon="services"
         />
@@ -504,8 +526,8 @@ export function Databases() {
           title="Detalle por base de datos"
           description={
             database.observedAt
-              ? `Observado ${new Date(database.observedAt * 1000).toLocaleTimeString("es-AR", { hourCycle: "h23" })}`
-              : "Esperando datos SQL"
+              ? `Observado ${new Date(database.observedAt * 1000).toLocaleTimeString('es-AR', { hourCycle: 'h23' })}`
+              : 'Esperando datos SQL'
           }
         />
         {database.databases?.length ? (
@@ -525,7 +547,7 @@ export function Databases() {
                     <td>
                       <strong>{item.name}</strong>
                     </td>
-                    <td>{format(item.bytes, "bytes")}</td>
+                    <td>{format(item.bytes, 'bytes')}</td>
                     <td>{format(item.connections)}</td>
                     <td>
                       <SourceStatus
@@ -576,15 +598,15 @@ export function Telemetry() {
         />
         <div className="mon-pipeline">
           {[
-            ["backend", "Aplicación", "Trazas del SDK"],
-            ["collector", "Collector", "Recepción y exportación"],
-            ["jaeger", "Jaeger", "Consulta de trazas"],
+            ['backend', 'Aplicación', 'Trazas del SDK'],
+            ['collector', 'Collector', 'Recepción y exportación'],
+            ['jaeger', 'Jaeger', 'Consulta de trazas'],
           ].map(([id, name, caption], index) => (
             <React.Fragment key={id}>
               {index > 0 && <Icon name="arrow" />}
               <div>
                 <Icon
-                  name={id === "backend" ? "services" : "trace"}
+                  name={id === 'backend' ? 'services' : 'trace'}
                   size={24}
                 />
                 <strong>{name}</strong>
@@ -629,9 +651,9 @@ export function GrafanaDashboards() {
   const { revision, params } = useMonitoring();
   const { data, error, loading } = useRemote(
     `/api/dashboards?refresh=${revision}`,
-    "dashboards",
+    'dashboards',
   );
-  const selected = params.get("dashboard");
+  const selected = params.get('dashboard');
   const dashboards = data?.dashboards || [];
   const visible = selected
     ? dashboards.filter((item) => item.uid === selected)
@@ -652,9 +674,9 @@ export function GrafanaDashboards() {
         <div className="mon-dashboard-list">
           {dashboards.map((dashboard) => (
             <Link
-              className={`mon-dashboard-item ${selected === dashboard.uid ? "is-selected" : ""}`}
+              className={`mon-dashboard-item ${selected === dashboard.uid ? 'is-selected' : ''}`}
               key={dashboard.uid}
-              to={`/dashboards?${new URLSearchParams({ ...Object.fromEntries(params), dashboard: dashboard.uid })}`}
+              to={`/sistema/dashboards?${new URLSearchParams({ ...Object.fromEntries(params), dashboard: dashboard.uid })}`}
             >
               <Icon name="chart" size={22} />
               <span>
@@ -700,7 +722,7 @@ export function GrafanaDashboards() {
                 key={panel.id}
                 title={panel.title}
                 panel={{ uid: dashboard.uid, id: panel.id }}
-                description={panel.description || "Evolución durante el período seleccionado"}
+                description={panel.description || 'Evolución durante el período seleccionado'}
               />
             ))}
           </div>

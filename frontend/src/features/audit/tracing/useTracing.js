@@ -1,22 +1,22 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { getServices, getTraces } from "./api";
-import { RANGES, summarize } from "./model";
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { getServices, getTraces } from './api';
+import { RANGES, summarize } from './model';
 
 export const TracingContext = createContext(null);
-// Accede al estado de tracing compartido por la central.
+// Accede al estado de tracing compartido por la sección.
 export const useTracing = () => useContext(TracingContext);
 
 // Administra filtros y consultas cancelables de Jaeger solo en las pantallas de tracing.
 export function useTraceQuery(enabled = true) {
   const [params, setParams] = useSearchParams();
-  const service = params.get("service") || "backend-api";
-  const range = Object.hasOwn(RANGES, params.get("range"))
-    ? params.get("range")
-    : "1h";
-  const operation = params.get("operation") || "";
-  const status = params.get("status") === "error" ? "error" : "";
-  const requestedDuration = Number(params.get("minDuration"));
+  const service = params.get('service') || 'backend-api';
+  const range = Object.hasOwn(RANGES, params.get('range'))
+    ? params.get('range')
+    : '1h';
+  const operation = params.get('operation') || '';
+  const status = params.get('status') === 'error' ? 'error' : '';
+  const requestedDuration = Number(params.get('minDuration'));
   const minDuration = Number.isFinite(requestedDuration)
     ? Math.max(0, requestedDuration)
     : 0;
@@ -25,7 +25,7 @@ export function useTraceQuery(enabled = true) {
     [service, range, operation, status, minDuration],
   );
   const [services, setServices] = useState([]);
-  const [serviceError, setServiceError] = useState("");
+  const [serviceError, setServiceError] = useState('');
   const [revision, setRevision] = useState(0);
   const [interval, setRefreshInterval] = useState(0);
   const [result, setResult] = useState({
@@ -34,7 +34,7 @@ export function useTraceQuery(enabled = true) {
     updated: null,
     loading: true,
     refreshing: false,
-    error: "",
+    error: '',
   });
   // Solicita una actualización de las trazas actuales.
   const refresh = () => setRevision((value) => value + 1);
@@ -45,7 +45,7 @@ export function useTraceQuery(enabled = true) {
       (current) => {
         const next = new URLSearchParams(current);
         Object.entries(values).forEach(([key, value]) =>
-          value === "" || value == null
+          value === '' || value == null
             ? next.delete(key)
             : next.set(key, String(value)),
         );
@@ -60,8 +60,8 @@ export function useTraceQuery(enabled = true) {
     const controller = new AbortController();
     getServices(controller.signal)
       .then((data) => {
-        setServices(data.filter((value) => typeof value === "string").sort());
-        setServiceError("");
+        setServices(data.filter((value) => typeof value === 'string').sort());
+        setServiceError('');
       })
       .catch((error) => {
         if (!controller.signal.aborted) setServiceError(error.message);
@@ -78,14 +78,14 @@ export function useTraceQuery(enabled = true) {
     const key = JSON.stringify(filters);
     setResult((previous) =>
       previous.key === key && previous.updated
-        ? { ...previous, refreshing: true, error: "" }
+        ? { ...previous, refreshing: true, error: '' }
         : {
             traces: [],
             window,
             updated: null,
             loading: true,
             refreshing: false,
-            error: "",
+            error: '',
             key,
           },
     );
@@ -98,7 +98,7 @@ export function useTraceQuery(enabled = true) {
             updated: new Date(),
             loading: false,
             refreshing: false,
-            error: "",
+            error: '',
             key,
           });
       })
@@ -120,7 +120,7 @@ export function useTraceQuery(enabled = true) {
   useEffect(() => {
     if (!interval || !enabled) return undefined;
     const timer = setInterval(() => {
-      if (document.visibilityState === "visible")
+      if (document.visibilityState === 'visible')
         setRevision((value) => value + 1);
     }, interval * 1000);
     return () => clearInterval(timer);

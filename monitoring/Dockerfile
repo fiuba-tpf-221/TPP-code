@@ -1,15 +1,5 @@
-# Etapa 1: Build de la interfaz independiente
-FROM node:20-alpine AS build
-
-WORKDIR /app
-
-COPY ui/package*.json ./
-RUN npm ci
-
-COPY ui/ ./
-RUN npm run build
-
-# Etapa 2: Servidor de lectura y archivos estáticos
+# La UI se mudó al frontend principal (:3000 -> Sistema / Auditoría): esto ya es solo la API JSON
+# que esas páginas consumen cruzando orígenes (ver server/main.py -> CORSMiddleware).
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -18,7 +8,6 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY server/ ./server/
-COPY --from=build /app/dist ./static/
 
 USER 65534:65534
 EXPOSE 8080

@@ -1,18 +1,18 @@
-import React from "react";
-import { Metric, PanelHeader } from "../tracing/components";
-import { RANGES } from "../tracing/model";
-import { format } from "./charts";
-import { useMonitoring, useRemote } from "./useMonitoring";
+import React from 'react';
+import { Metric, PanelHeader } from '../../audit/tracing/components';
+import { RANGES } from '../../audit/tracing/model';
+import { format } from './charts';
+import { useMonitoring, useRemote } from './useMonitoring';
 
 const COUNTS = [
-  ["accepted", "Spans aceptados", "Recibidos por el Collector mediante OTLP", "trace"],
-  ["exported", "Spans enviados", "Exportados desde el Collector hacia Jaeger", "trace"],
-  ["refused", "Spans rechazados", "Rechazados al ingresar al Collector", "error"],
-  ["failed", "Spans con fallo de envío", "Spans de envíos fallidos; pueden reintentarse", "error"],
+  ['accepted', 'Spans aceptados', 'Recibidos por el Collector mediante OTLP', 'trace'],
+  ['exported', 'Spans enviados', 'Exportados desde el Collector hacia Jaeger', 'trace'],
+  ['refused', 'Spans rechazados', 'Rechazados al ingresar al Collector', 'error'],
+  ['failed', 'Spans con fallo de envío', 'Spans de envíos fallidos; pueden reintentarse', 'error'],
 ];
 
-const count = (value) => value == null ? "—" :
-  new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 }).format(value);
+const count = (value) => value == null ? '—' :
+  new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(value);
 
 // Compara incrementos de contadores, sin sumar puntos de las tasas temporales.
 export default function TelemetrySummary() {
@@ -24,12 +24,12 @@ export default function TelemetrySummary() {
   const values = data?.values || {};
   const partial = Object.keys(data?.errors || {}).length > 0;
   const status = error
-    ? data ? "Datos anteriores" : "Sin datos"
-    : loading ? "Actualizando" : "Prometheus";
+    ? data ? 'Datos anteriores' : 'Sin datos'
+    : loading ? 'Actualizando' : 'Prometheus';
   const description = (key, text) =>
-    error && data ? "Dato anterior; no se pudo actualizar" :
-      data?.errors?.[key] ? "No se pudo consultar esta métrica" :
-        data && values[key] == null ? "Sin muestras disponibles" : text;
+    error && data ? 'Dato anterior; no se pudo actualizar' :
+      data?.errors?.[key] ? 'No se pudo consultar esta métrica' :
+        data && values[key] == null ? 'Sin muestras disponibles' : text;
   return (
     <>
       <section className="obs-panel mon-telemetry-summary">
@@ -41,7 +41,7 @@ export default function TelemetrySummary() {
         </PanelHeader>
         {(error || partial) && (
           <p className="mon-inline-error" role="status">
-            {error || "No se pudieron actualizar todas las métricas."}
+            {error || 'No se pudieron actualizar todas las métricas.'}
           </p>
         )}
         <div className="obs-metrics">
@@ -52,7 +52,7 @@ export default function TelemetrySummary() {
               value={count(values[key])}
               description={description(key, text)}
               icon={icon}
-              accent={key === "accepted" || key === "exported"}
+              accent={key === 'accepted' || key === 'exported'}
             />
           ))}
         </div>
@@ -67,23 +67,23 @@ export default function TelemetrySummary() {
         <PanelHeader
           title="Recursos del Collector"
           description={data
-            ? `Medición al ${new Date(data.end * 1000).toLocaleTimeString("es-AR", { hourCycle: "h23" })}`
-            : "Consultando las últimas muestras"}
+            ? `Medición al ${new Date(data.end * 1000).toLocaleTimeString('es-AR', { hourCycle: 'h23' })}`
+            : 'Consultando las últimas muestras'}
         />
         <div className="obs-metrics mon-collector-resources">
           <Metric
             label="Cola de envío a Jaeger"
             value={`${count(values.queue)} / ${count(values.queue_capacity)}`}
-            description={description("queue",
+            description={description('queue',
               values.queue_capacity == null
-                ? "Elementos pendientes / capacidad sin datos"
-                : "Elementos pendientes / capacidad de la cola; no son spans")}
+                ? 'Elementos pendientes / capacidad sin datos'
+                : 'Elementos pendientes / capacidad de la cola; no son spans')}
             icon="trace"
           />
           <Metric
             label="Memoria del Collector"
-            value={format(values.collector_memory, "bytes")}
-            description={description("collector_memory", "Memoria residente del proceso")}
+            value={format(values.collector_memory, 'bytes')}
+            description={description('collector_memory', 'Memoria residente del proceso')}
             icon="services"
           />
         </div>

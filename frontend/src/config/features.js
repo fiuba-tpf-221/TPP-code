@@ -1,10 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════════════
 //  INTERRUPTOR ÚNICO: cómo funciona la aplicación
 //
-//    'mock'      Ambiente controlado. Login, usuarios y panel Sistema simulados en el navegador.
-//                No necesita Docker ni backend: todas las pantallas funcionan.
-//    'keycloak'  Integración real. Login con el Keycloak de la infraestructura y panel Sistema con los
-//                servicios reales (los usuarios siguen simulados hasta que el backend los tenga).
+//    'mock'      Ambiente controlado. Login y usuarios simulados en el navegador. Sistema y
+//                Auditoría siguen consultando los servicios reales (necesitan Docker arriba);
+//                sin una sesión real de Keycloak, esos paneles muestran que falta autenticación.
+//    'keycloak'  Integración real. Login con el Keycloak de la infraestructura (los usuarios
+//                siguen simulados hasta que el backend los tenga).
 //
 //  Dos formas de cambiarlo:
 //    · Para todo el equipo: cambiar DEFAULT_MODE acá abajo.
@@ -21,14 +22,9 @@ if (!MODES.includes(requested)) {
 }
 const MODE = MODES.includes(requested) ? requested : DEFAULT_MODE;
 
-const asBoolean = (value, fallback) => (value === 'true' ? true : value === 'false' ? false : fallback);
-
 export const FEATURES = {
   // Cómo se autentica la app. Lo define el interruptor de arriba.
   AUTH_PROVIDER: MODE,
-  // El panel Sistema muestra estados simulados en vez de consultar los servicios reales.
-  // Por defecto acompaña al modo; para ver el estado real con login simulado: REACT_APP_SIMULATE_INFRA=false.
-  SIMULATE_INFRA: asBoolean(process.env.REACT_APP_SIMULATE_INFRA, MODE === 'mock'),
   // true = usuarios (alta, consulta, modificación) simulados en el navegador. Pasar a false cuando el backend los implemente.
   USE_MOCK_API: true,
   // Pestaña "Crear cuenta" en el acceso. Ver si otra US la reemplaza por el alta hecha por administradores.

@@ -29,12 +29,14 @@ export const INFRA_PROBES = {
   minio: at(9002, '/minio/health/live'),
 };
 
-// Consolas de administración y monitoreo (se abren en otra pestaña).
-// La Central de Monitoreo (docker-compose propio, "a un costado") pide su propio login contra el
-// mismo Keycloak al entrar: con la sesión ya abierta en esta app, entra directo (SSO); si no, pide
-// usuario y contraseña de nuevo (ver monitoring/ui/src/keycloak.js).
+// Central de Monitoreo: docker-compose propio ("a un costado"), API JSON pura (sin UI propia).
+// Las pantallas de Sistema/Auditoría la consultan directo desde el navegador con el token de esta
+// sesión (ver shared/api/monitoringApi.js); por eso no es un link de CONSOLES.
+export const MONITORING_API_URL = at(3002);
+
+// Consolas de administración (se abren en otra pestaña): acceso directo a la herramienta real,
+// más allá de lo que ya se ve embebido en Sistema/Auditoría.
 export const CONSOLES = [
-  { id: 'monitoring', name: 'Central de Monitoreo', url: at(3002), desc: 'Métricas, trazas y dashboards del stack', icon: 'dashboard' },
   { id: 'grafana', name: 'Grafana Dashboards', url: at(3001), desc: 'Métricas e indicadores', icon: 'dashboard' },
   { id: 'rabbitmq', name: 'RabbitMQ Console', url: at(15672), desc: 'Gestor de colas de mensajes', icon: 'queue' },
   { id: 'minio', name: 'MinIO Console', url: at(9001), desc: 'Explorador S3 / Buckets', icon: 'storage' },

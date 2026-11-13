@@ -1,4 +1,8 @@
-"""Servidor propio de la central: UI estática, sondas y consultas acotadas."""
+"""Servidor propio de la central: sondas y consultas acotadas, servidas como API JSON.
+
+La interfaz vive ahora en el frontend principal (:3000, secciones Sistema y Auditoría),
+que consume esta API cruzando orígenes; de ahí el CORSMiddleware más abajo.
+"""
 
 import asyncio
 import json
@@ -9,8 +13,8 @@ from contextlib import asynccontextmanager, suppress
 
 import httpx
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, Response
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
 from .auth import require_admin
 from .collectors import Monitor
@@ -21,7 +25,6 @@ from .config import (
     METRICS,
     PROMETHEUS,
     SPAN_COUNTERS,
-    STATIC,
 )
 
 # Todo lo que cuelga de /api expone datos de logs, trazas y métricas: requiere el rol
@@ -55,6 +58,15 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
+)
+
+# Solo GET, sin cookies: el front manda el token de Keycloak en el header Authorization,
+# no hay sesión de navegador que proteger con un origen restringido.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET"],
+    allow_headers=["Authorization"],
 )
 
 
@@ -370,15 +382,3 @@ async def jaeger_trace(trace_id: str, request: Request):
 
 
 app.include_router(api)
-
-app.mount(
-    "/assets", StaticFiles(directory=STATIC / "assets", check_dir=False), name="assets"
-)
-
-
-@app.get("/{path:path}")
-def spa(path: str) -> FileResponse:
-    """Sirve la interfaz y sus rutas sin capturar endpoints de API desconocidos."""
-    if path.startswith("api/") or "." in path.rsplit("/", 1)[-1]:
-        raise HTTPException(404, "Ruta desconocida.")
-    return FileResponse(STATIC / "index.html", headers={"Cache-Control": "no-cache"})
