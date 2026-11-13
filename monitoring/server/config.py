@@ -3,21 +3,23 @@
 import os
 from pathlib import Path
 
-HOST = os.getenv("MONITOR_TARGET_HOST", "host.docker.internal")
-PROMETHEUS = os.getenv("MONITOR_PROMETHEUS_URL", f"http://{HOST}:9090").rstrip("/")
-JAEGER = os.getenv("MONITOR_JAEGER_URL", f"http://{HOST}:16686").rstrip("/")
+# Todo esto se resuelve por nombre de servicio en la red compartida (docker-compose.yml ->
+# app-net), no por host.docker.internal: en la práctica esa ruta no es confiable (en esta misma
+# máquina, por ejemplo, choca con cualquier otro proceso que ya esté escuchando ese puerto en el
+# host) y hacía aparecer servicios como caídos sin estarlo. Los puertos son los internos del
+# contenedor, no los publicados al host (p. ej. grafana:3000, no :3001; frontend:80, no :3000).
+PROMETHEUS = os.getenv("MONITOR_PROMETHEUS_URL", "http://prometheus:9090").rstrip("/")
+JAEGER = os.getenv("MONITOR_JAEGER_URL", "http://jaeger:16686").rstrip("/")
 
 # Autenticación: la central exige el mismo Keycloak e igual rol que usa el front principal
-# para mostrar el panel Sistema (ver frontend/src/config/keycloakRoles.js). Por nombre de servicio
-# en la red compartida (docker-compose.yml -> app-net), no por HOST: todo /api depende de esto en
-# cada request, así que no puede quedar atado a si host.docker.internal resuelve bien o no.
+# para mostrar el panel Sistema (ver frontend/src/config/keycloakRoles.js).
 KEYCLOAK = os.getenv("MONITOR_KEYCLOAK_URL", "http://keycloak:8080").rstrip("/")
 KEYCLOAK_REALM = os.getenv("MONITOR_KEYCLOAK_REALM", "tpp-realm")
 REQUIRED_ROLE = os.getenv("MONITOR_REQUIRED_ROLE", "administrador")
 DASHBOARDS = Path(os.getenv("MONITOR_DASHBOARDS_DIR", "/app/dashboards"))
 POSTGRES_STORAGE = Path(os.getenv("MONITOR_DB_STORAGE_PATH", "/app/postgres-storage"))
 DATABASE = {
-    "host": os.getenv("MONITOR_DB_HOST", HOST),
+    "host": os.getenv("MONITOR_DB_HOST", "postgres"),
     "port": os.getenv("MONITOR_DB_PORT", "5432"),
     "dbname": os.getenv("MONITOR_DB_NAME", "appdb"),
     "user": os.getenv("MONITOR_DB_USER", "tpp_monitor"),
@@ -28,30 +30,30 @@ DATABASE = {
 }
 
 HTTP_SERVICES = (
-    ("backend", "Backend API", f"http://{HOST}:8000/health", ("status", "ONLINE")),
-    ("frontend", "Frontend", f"http://{HOST}:3000/", None),
+    ("backend", "Backend API", "http://backend:8000/health", ("status", "ONLINE")),
+    ("frontend", "Frontend", "http://frontend:80/", None),
     (
         "keycloak",
         "Keycloak",
-        f"http://{HOST}:8080/realms/tpp-realm/.well-known/openid-configuration",
+        "http://keycloak:8080/realms/tpp-realm/.well-known/openid-configuration",
         None,
     ),
-    ("minio", "MinIO", f"http://{HOST}:9002/minio/health/live", None),
+    ("minio", "MinIO", "http://minio:9000/minio/health/live", None),
     ("prometheus", "Prometheus", PROMETHEUS + "/-/ready", None),
-    ("grafana", "Grafana", f"http://{HOST}:3001/api/health", ("database", "ok")),
+    ("grafana", "Grafana", "http://grafana:3000/api/health", ("database", "ok")),
     ("jaeger", "Jaeger", JAEGER + "/api/services", None),
-    ("collector", "OpenTelemetry Collector", f"http://{HOST}:8888/metrics", None),
+    ("collector", "OpenTelemetry Collector", "http://otel-collector:8888/metrics", None),
     (
         "sonarqube",
         "SonarQube",
-        f"http://{HOST}:9000/api/system/status",
+        "http://sonarqube:9000/api/system/status",
         ("status", "UP"),
     ),
 )
 TCP_SERVICES = (
     ("postgres", "PostgreSQL", DATABASE["host"], DATABASE["port"]),
-    ("rabbitmq", "RabbitMQ", HOST, 5673),
-    ("redis", "Redis", HOST, 6380),
+    ("rabbitmq", "RabbitMQ", "rabbitmq", 5672),
+    ("redis", "Redis", "redis_keycloak", 6379),
 )
 
 # Acota la comparación al receptor OTLP y a la salida de trazas hacia Jaeger.
