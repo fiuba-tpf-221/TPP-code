@@ -1,3 +1,5 @@
+import { getToken } from "./auth";
+
 // Consulta JSON con timeout, cancelación y errores comunes a todas las fuentes.
 export async function read(url, signal, timeoutMillis = 12000) {
   const controller = new AbortController();
@@ -6,17 +8,23 @@ export async function read(url, signal, timeoutMillis = 12000) {
   signal?.addEventListener("abort", abort, { once: true });
   const timer = setTimeout(abort, timeoutMillis);
   try {
+    const token = getToken();
     const response = await fetch(url, {
       signal: controller.signal,
       cache: "no-store",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
     if (!response.ok)
       throw new Error(
-        response.status === 404
-          ? "No encontramos los datos solicitados. Pueden haber expirado."
-          : response.status === 422
-            ? "Este panel requiere una consulta o variable no soportada."
-            : "La fuente de datos no está disponible.",
+        response.status === 401
+          ? "Necesitás iniciar sesión para ver esta información."
+          : response.status === 403
+            ? "Tu usuario no tiene permiso para ver esta información."
+            : response.status === 404
+              ? "No encontramos los datos solicitados. Pueden haber expirado."
+              : response.status === 422
+                ? "Este panel requiere una consulta o variable no soportada."
+                : "La fuente de datos no está disponible.",
       );
     return await response.json();
   } catch (error) {

@@ -6,6 +6,14 @@ from pathlib import Path
 HOST = os.getenv("MONITOR_TARGET_HOST", "host.docker.internal")
 PROMETHEUS = os.getenv("MONITOR_PROMETHEUS_URL", f"http://{HOST}:9090").rstrip("/")
 JAEGER = os.getenv("MONITOR_JAEGER_URL", f"http://{HOST}:16686").rstrip("/")
+
+# Autenticación: la central exige el mismo Keycloak e igual rol que usa el front principal
+# para mostrar el panel Sistema (ver frontend/src/config/keycloakRoles.js). Por nombre de servicio
+# en la red compartida (docker-compose.yml -> app-net), no por HOST: todo /api depende de esto en
+# cada request, así que no puede quedar atado a si host.docker.internal resuelve bien o no.
+KEYCLOAK = os.getenv("MONITOR_KEYCLOAK_URL", "http://keycloak:8080").rstrip("/")
+KEYCLOAK_REALM = os.getenv("MONITOR_KEYCLOAK_REALM", "tpp-realm")
+REQUIRED_ROLE = os.getenv("MONITOR_REQUIRED_ROLE", "administrador")
 STATIC = Path(os.getenv("MONITOR_STATIC_DIR", "/app/static"))
 DASHBOARDS = Path(os.getenv("MONITOR_DASHBOARDS_DIR", "/app/dashboards"))
 POSTGRES_STORAGE = Path(os.getenv("MONITOR_DB_STORAGE_PATH", "/app/postgres-storage"))

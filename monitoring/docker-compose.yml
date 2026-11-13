@@ -21,6 +21,19 @@ services:
       - /tmp:size=32m,mode=1777
     mem_limit: 512m
     cpus: 1.0
+    networks:
+      - default
+      - app-net
+
+networks:
+  # Red del Compose principal: se usa solo para llegar a Keycloak por nombre de servicio al validar
+  # el token (server/auth.py). host.docker.internal sigue andando para el resto (Prometheus, Jaeger);
+  # para Keycloak no es igual de confiable (según el host, puede no resolver o quedar bloqueado por
+  # otro proceso en el mismo puerto), y como la central no funciona sin poder validar el token, esta
+  # ruta no puede ser la única.
+  app-net:
+    external: true
+    name: ${MONITOR_APP_NETWORK:-tpp-code_default}
 
 volumes:
   postgres_storage:

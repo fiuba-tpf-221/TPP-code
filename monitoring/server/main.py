@@ -8,10 +8,11 @@ import time
 from contextlib import asynccontextmanager, suppress
 
 import httpx
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 
+from .auth import require_admin
 from .collectors import Monitor
 from .config import (
     COLLECTOR_GAUGES,
@@ -22,6 +23,10 @@ from .config import (
     SPAN_COUNTERS,
     STATIC,
 )
+
+# Todo lo que cuelga de /api expone datos de logs, trazas y métricas: requiere el rol
+# administrador del mismo Keycloak que usa el front principal (ver server/auth.py).
+api = APIRouter(prefix="/api", dependencies=[Depends(require_admin)])
 
 
 @asynccontextmanager
@@ -73,7 +78,7 @@ def health() -> dict:
     return {"status": "ok"}
 
 
-@app.get("/api/overview")
+@api.get("/overview")
 async def overview(request: Request) -> dict:
     """Combina las últimas sondas con el estado de recolección de Prometheus."""
     snapshot = request.app.state.monitor.snapshot
@@ -155,7 +160,7 @@ def time_window(start: float, end: float) -> int:
     return max(15, math.ceil((end - start) / 120))
 
 
-@app.get("/api/telemetry/summary")
+@api.get("/telemetry/summary")
 async def telemetry_summary(request: Request, start: float, end: float) -> dict:
     """Estima incrementos del período y consulta gauges al final de la ventana.
 
@@ -202,7 +207,7 @@ async def telemetry_summary(request: Request, start: float, end: float) -> dict:
     }
 
 
-@app.get("/api/metrics/{name}")
+@api.get("/metrics/{name}")
 async def metric(name: str, request: Request, start: float, end: float) -> dict:
     """Consulta una métrica del catálogo permitido por la central."""
     if name not in METRICS:
@@ -253,7 +258,7 @@ def configured_dashboards() -> list[dict]:
     return result
 
 
-@app.get("/api/dashboards")
+@api.get("/dashboards")
 def dashboards() -> dict:
     """Lista los dashboards disponibles sin exponer sus consultas internas."""
     return {
@@ -271,7 +276,7 @@ def dashboards() -> dict:
     }
 
 
-@app.get("/api/dashboards/{uid}/panels/{panel_id}")
+@api.get("/dashboards/{uid}/panels/{panel_id}")
 async def dashboard_panel(
     uid: str, panel_id: str, request: Request, start: float, end: float
 ):
@@ -310,13 +315,13 @@ async def dashboard_panel(
     }
 
 
-@app.get("/api/jaeger/services")
+@api.get("/jaeger/services")
 async def jaeger_services(request: Request):
     """Lista los servicios que ya tienen trazas almacenadas en Jaeger."""
     return await upstream(request, JAEGER, "/api/services")
 
 
-@app.get("/api/jaeger/operations")
+@api.get("/jaeger/operations")
 async def jaeger_operations(
     request: Request, service: str = Query(min_length=1, max_length=256)
 ):
@@ -324,7 +329,7 @@ async def jaeger_operations(
     return await upstream(request, JAEGER, "/api/operations", {"service": service})
 
 
-@app.get("/api/jaeger/traces")
+@api.get("/jaeger/traces")
 async def jaeger_traces(
     request: Request,
     service: str = Query(min_length=1, max_length=256),
@@ -356,13 +361,15 @@ async def jaeger_traces(
     )
 
 
-@app.get("/api/jaeger/traces/{trace_id}")
+@api.get("/jaeger/traces/{trace_id}")
 async def jaeger_trace(trace_id: str, request: Request):
     """Recupera una traza por su identificador hexadecimal."""
     if not re.fullmatch(r"(?:[0-9a-fA-F]{16}|[0-9a-fA-F]{32})", trace_id):
         raise HTTPException(400, "Trace ID inválido.")
     return await upstream(request, JAEGER, "/api/traces/" + trace_id)
 
+
+app.include_router(api)
 
 app.mount(
     "/assets", StaticFiles(directory=STATIC / "assets", check_dir=False), name="assets"
