@@ -1,7 +1,8 @@
 """Valida el JWT de Keycloak y exige el rol de administrador para los datos sensibles.
 
-La central no tiene login propio: reutiliza el mismo realm que ya usa el front principal
-(frontend/src/config/services.js -> KEYCLOAK) para no duplicar usuarios ni roles.
+La UI (ui/src/keycloak.js) inicia sesión contra el mismo realm que ya usa el front principal
+(frontend/src/config/services.js -> KEYCLOAK), para no duplicar usuarios ni roles; esto solo
+valida que el token que llega en cada request sea genuino y tenga el rol requerido.
 """
 
 import time
@@ -33,8 +34,7 @@ def _extract_token(request: Request) -> str | None:
     header = request.headers.get("authorization", "")
     if header.lower().startswith("bearer "):
         return header[7:]
-    # La carga inicial del iframe no puede mandar headers propios: el front la pasa por query string.
-    return request.query_params.get("token")
+    return None
 
 
 async def require_admin(request: Request) -> dict:

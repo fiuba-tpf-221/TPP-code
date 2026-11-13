@@ -8,7 +8,7 @@ export async function read(url, signal, timeoutMillis = 12000) {
   signal?.addEventListener("abort", abort, { once: true });
   const timer = setTimeout(abort, timeoutMillis);
   try {
-    const token = getToken();
+    const token = await getToken();
     const response = await fetch(url, {
       signal: controller.signal,
       cache: "no-store",

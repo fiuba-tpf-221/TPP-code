@@ -4,7 +4,6 @@ import { CONSOLES, INFRA_CARDS } from '../../config/services';
 import { FEATURES } from '../../config/features';
 import Alert from '../../shared/components/Alert';
 import { checkInfrastructure, SIMULATED_SCENARIOS } from './infraService';
-import MonitoringEmbed from './MonitoringEmbed';
 import './system.css';
 
 const STATUS = {
@@ -85,18 +84,8 @@ export default function SystemStatusPage() {
         </div>
       </section>
 
-      <section className="system-section" aria-labelledby="monitoring-title">
-        <h2 id="monitoring-title">Central de monitoreo</h2>
-        <p className="muted">Métricas, trazas y dashboards del stack. Solo lo ve quien entra con el permiso de Sistema.</p>
-        {FEATURES.AUTH_PROVIDER === 'keycloak' ? (
-          <MonitoringEmbed />
-        ) : (
-          <Alert kind="info">Disponible solo con Keycloak real (REACT_APP_MODE=keycloak); en modo simulado no hay token para mostrarla.</Alert>
-        )}
-      </section>
-
       <section className="system-section" aria-labelledby="consoles-title">
-        <h2 id="consoles-title">Consolas de administración</h2>
+        <h2 id="consoles-title">Consolas de administración y monitoreo</h2>
         <div className="console-grid">
           {CONSOLES.map((c) => (
             <a key={c.id} className="console" href={c.url} target="_blank" rel="noreferrer noopener">

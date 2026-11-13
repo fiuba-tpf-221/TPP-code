@@ -29,13 +29,12 @@ export const INFRA_PROBES = {
   minio: at(9002, '/minio/health/live'),
 };
 
-// Central de monitoreo (docker-compose propio, "a un costado"): se embebe en el panel Sistema,
-// no como link externo. Requiere el rol administrador y, en el Keycloak real, pasarle el token
-// (ver MonitoringEmbed.js); por eso no figura en CONSOLES, que son enlaces sin ese manejo.
-export const MONITORING_URL = at(3002);
-
 // Consolas de administración y monitoreo (se abren en otra pestaña).
+// La Central de Monitoreo (docker-compose propio, "a un costado") pide su propio login contra el
+// mismo Keycloak al entrar: con la sesión ya abierta en esta app, entra directo (SSO); si no, pide
+// usuario y contraseña de nuevo (ver monitoring/ui/src/keycloak.js).
 export const CONSOLES = [
+  { id: 'monitoring', name: 'Central de Monitoreo', url: at(3002), desc: 'Métricas, trazas y dashboards del stack', icon: 'dashboard' },
   { id: 'grafana', name: 'Grafana Dashboards', url: at(3001), desc: 'Métricas e indicadores', icon: 'dashboard' },
   { id: 'rabbitmq', name: 'RabbitMQ Console', url: at(15672), desc: 'Gestor de colas de mensajes', icon: 'queue' },
   { id: 'minio', name: 'MinIO Console', url: at(9001), desc: 'Explorador S3 / Buckets', icon: 'storage' },
